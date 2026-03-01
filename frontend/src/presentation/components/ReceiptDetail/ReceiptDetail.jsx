@@ -55,26 +55,27 @@ export function ReceiptDetail() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-4 flex justify-between items-start">
-          <button
-            onClick={() => navigate('/')}
-            className="text-blue-500 hover:text-blue-700"
-          >
-            ← Back to Receipts
-          </button>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/')}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              ← Back
+            </button>
             <button
               onClick={() => navigate(`/receipt/${receipt.id}/split`)}
               className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               Split Receipt
             </button>
-            <button
-              onClick={handleDelete}
-              className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
-            >
-              Delete
-            </button>
           </div>
+          <button
+            onClick={handleDelete}
+            className="text-red-500 hover:text-red-700 text-3xl font-bold leading-none"
+            title="Delete receipt"
+          >
+            ×
+          </button>
         </div>
 
         {/* Receipt Header */}
