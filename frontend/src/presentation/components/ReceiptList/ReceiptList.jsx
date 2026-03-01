@@ -5,13 +5,12 @@ import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 
 export function ReceiptList() {
-  const { receipts, loadReceipts } = useReceiptStore();
+  const { receipts, loadReceipts, deleteReceipt } = useReceiptStore();
   const navigate = useNavigate();
   const [defaultUserName, setDefaultUserName] = useState('');
 
   useEffect(() => {
     loadReceipts();
-    // Load default user name
     const defaultName = localStorage.getItem('defaultUserName') || '';
     setDefaultUserName(defaultName);
   }, [loadReceipts]);
@@ -21,35 +20,44 @@ export function ReceiptList() {
       return receipt.totalAmount;
     }
 
-    // If there's only one buyer (default user), show their share
     if (receipt.buyers.length === 1) {
       const buyer = receipt.buyers[0];
       return calculateBuyerShare(buyer.id, receipt);
     }
 
-    // If there are multiple buyers, show split info
-    const totalBuyers = receipt.buyers.length;
-    return `${receipt.totalAmount.toFixed(2)} RSD (${totalBuyers} people)`;
+    return null;
   };
 
-  const getShareDisplay = (receipt) => {
+  const getBuyersBreakdown = (receipt) => {
     if (!receipt.buyers || receipt.buyers.length === 0) {
-      return receipt.totalAmount.toFixed(2);
+      return null;
     }
 
-    // Find default buyer
-    const defaultBuyer = receipt.buyers.find(b => b.name === defaultUserName);
-    if (defaultBuyer) {
-      return calculateBuyerShare(defaultBuyer.id, receipt).toFixed(2);
-    }
-
-    // If first buyer exists
-    if (receipt.buyers[0]) {
-      return calculateBuyerShare(receipt.buyers[0].id, receipt).toFixed(2);
-    }
-
-    return receipt.totalAmount.toFixed(2);
+    return receipt.buyers.map(buyer => ({
+      name: buyer.name,
+      share: calculateBuyerShare(buyer.id, receipt)
+    }));
   };
+
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
+    if (confirm('Are you sure you want to delete this receipt?')) {
+      deleteReceipt(id);
+    }
+  };
+
+  // Sort receipts: by date descending, then by creation time
+  const sortedReceipts = [...receipts].sort((a, b) => {
+    const dateA = new Date(a.date).getTime();
+    const dateB = new Date(b.date).getTime();
+    if (dateA !== dateB) {
+      return dateB - dateA; // Most recent first
+    }
+    // If same date, sort by creation time
+    const createdA = new Date(a.createdAt || 0).getTime();
+    const createdB = new Date(b.createdAt || 0).getTime();
+    return createdB - createdA;
+  });
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
@@ -64,7 +72,7 @@ export function ReceiptList() {
           </button>
         </div>
 
-        {receipts.length === 0 ? (
+        {sortedReceipts.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -79,45 +87,61 @@ export function ReceiptList() {
           </div>
         ) : (
           <div className="space-y-4">
-            {receipts.map((receipt) => (
-              <div
-                key={receipt.id}
-                onClick={() => navigate(`/receipt/${receipt.id}`)}
-                className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition-shadow"
-              >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {new Date(receipt.date).toLocaleDateString('sr-RS', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p className="text-gray-500 text-sm mt-2">
-                      {receipt.products.length} items
-                    </p>
-                    {receipt.buyers && receipt.buyers.length > 0 && (
-                      <p className="text-sm text-blue-600 mt-1">
-                        {receipt.buyers.length === 1
-                          ? `Your share: ${getShareDisplay(receipt)} RSD`
-                          : `Split between ${receipt.buyers.length} people`
-                        }
+            {sortedReceipts.map((receipt) => {
+              const userShare = getUserShare(receipt);
+              const buyersBreakdown = getBuyersBreakdown(receipt);
+
+              return (
+                <div
+                  key={receipt.id}
+                  onClick={() => navigate(`/receipt/${receipt.id}`)}
+                  className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
+                      <p className="text-gray-500 text-sm mt-1">
+                        {new Date(receipt.date).toLocaleDateString('sr-RS', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
                       </p>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-xl text-gray-800">
-                      {getShareDisplay(receipt)} RSD
-                    </p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {receipt.buyers && receipt.buyers.length > 1 ? 'your share' : 'total'}
-                    </p>
+                      <p className="text-gray-500 text-sm mt-2">
+                        {receipt.products.length} items
+                      </p>
+                      {buyersBreakdown && (
+                        <div className="mt-2 space-y-1">
+                          {buyersBreakdown.map((buyer, idx) => (
+                            <div key={idx} className="text-sm text-gray-600">
+                              {buyer.name}: {buyer.share.toFixed(2)} RSD
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-right flex flex-col items-end gap-2">
+                      <p className="font-bold text-xl text-gray-800">
+                        {receipt.totalAmount.toFixed(2)} RSD
+                      </p>
+                      {buyersBreakdown && buyersBreakdown.length > 1 && (
+                        <div className="text-xs text-gray-400">
+                          {buyersBreakdown.length} people
+                        </div>
+                      )}
+                      <button
+                        onClick={(e) => handleDelete(receipt.id, e)}
+                        className="text-red-500 hover:text-red-700 text-sm font-medium"
+                      >
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
