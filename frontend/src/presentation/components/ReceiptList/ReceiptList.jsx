@@ -79,18 +79,20 @@ export function ReceiptList() {
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow relative"
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
                 >
-                  <button
-                    onClick={(e) => handleDelete(receipt.id, e)}
-                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-xl font-bold leading-none"
-                    title="Delete receipt"
-                  >
-                    ×
-                  </button>
+                  <div className="p-4 pb-2 flex justify-end">
+                    <button
+                      onClick={(e) => handleDelete(receipt.id, e)}
+                      className="text-red-500 hover:text-red-700 text-2xl font-bold leading-none p-1"
+                      title="Delete receipt"
+                    >
+                      ×
+                    </button>
+                  </div>
                   <div
                     onClick={() => navigate(`/receipt/${receipt.id}`)}
-                    className="cursor-pointer pr-8"
+                    className="cursor-pointer px-4 pb-4"
                   >
                     <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
                     <p className="text-gray-500 text-sm mt-1">
@@ -103,21 +105,21 @@ export function ReceiptList() {
                     <p className="text-gray-500 text-sm mt-2">
                       {receipt.products.length} items
                     </p>
-                  </div>
-                  <div className="mt-3 flex justify-end items-start">
-                    <div className="text-right">
-                      <p className="font-bold text-xl text-gray-800">
-                        {receipt.totalAmount.toFixed(2)} RSD
-                      </p>
-                      {buyersBreakdown && (
-                        <div className="mt-2 space-y-1">
-                          {buyersBreakdown.map((buyer, idx) => (
-                            <div key={idx} className="text-sm text-gray-600">
-                              {buyer.name}: {buyer.share.toFixed(2)} RSD
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                    <div className="mt-3 flex justify-end items-start">
+                      <div className="text-right">
+                        <p className="font-bold text-xl text-gray-800">
+                          {receipt.totalAmount.toFixed(2)} RSD
+                        </p>
+                        {buyersBreakdown && (
+                          <div className="mt-2 space-y-1">
+                            {buyersBreakdown.map((buyer, idx) => (
+                              <div key={idx} className="text-sm text-gray-600">
+                                {buyer.name}: {buyer.share.toFixed(2)} RSD
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
