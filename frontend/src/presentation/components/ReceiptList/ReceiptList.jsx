@@ -94,19 +94,21 @@ export function ReceiptList() {
                     onClick={() => navigate(`/receipt/${receipt.id}`)}
                     className="cursor-pointer px-4 pb-4"
                   >
-                    <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
-                    <p className="text-gray-500 text-sm mt-1">
-                      {new Date(receipt.date).toLocaleDateString('sr-RS', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </p>
-                    <p className="text-gray-500 text-sm mt-2">
-                      {receipt.products.length} items
-                    </p>
-                    <div className="mt-3 flex justify-end items-start">
-                      <div className="text-right">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
+                        <p className="text-gray-500 text-sm mt-1">
+                          {new Date(receipt.date).toLocaleDateString('sr-RS', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </p>
+                        <p className="text-gray-500 text-sm mt-2">
+                          {receipt.products.length} items
+                        </p>
+                      </div>
+                      <div className="text-right ml-4">
                         <p className="font-bold text-xl text-gray-800">
                           {receipt.totalAmount.toFixed(2)} RSD
                         </p>
