@@ -49,9 +49,11 @@ export default async function handler(req, res) {
     }
     const html = await htmlResponse.text();
 
-    // 3. Извлечь invoiceNumber и token из HTML
+    // 3. Извлечь invoiceNumber, token, locationName и date из HTML
     const invoiceMatch = html.match(/viewModel\.InvoiceNumber\('([^']+)'\)/);
     const tokenMatch = html.match(/viewModel\.Token\('([^']+)'\)/);
+    const locationMatch = html.match(/viewModel\.LocationName\('([^']+)'\)/);
+    const dateMatch = html.match(/viewModel\.DateTime\('([^']+)'\)/);
 
     if (!invoiceMatch || !tokenMatch) {
       return res.status(400).json({ error: 'Failed to parse receipt data from HTML' });
@@ -59,6 +61,8 @@ export default async function handler(req, res) {
 
     const invoiceNumber = invoiceMatch[1];
     const token = tokenMatch[1];
+    const locationName = locationMatch ? locationMatch[1] : 'Receipt from SUF system';
+    const receiptDate = dateMatch ? new Date(dateMatch[1]) : new Date();
 
     // 4. Получить детали продуктов
     const specsResponse = await fetch('https://suf.purs.gov.rs/specifications', {
@@ -82,8 +86,8 @@ export default async function handler(req, res) {
       success: true,
       data: {
         invoiceNumber,
-        storeName: 'Receipt from SUF system',
-        date: new Date().toISOString(),
+        storeName: locationName,
+        date: receiptDate.toISOString(),
         products: specsData.items.map(item => ({
           name: item.name,
           quantity: item.quantity,
