@@ -6,8 +6,10 @@ import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 export function ReceiptDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, receipts } = useReceiptStore();
+  const { activeReceipt, setActiveReceipt, receipts, updateStoreName } = useReceiptStore();
   const [receipt, setReceipt] = useState(null);
+  const [isEditingStore, setIsEditingStore] = useState(false);
+  const [editedStoreName, setEditedStoreName] = useState('');
 
   useEffect(() => {
     if (!activeReceipt || activeReceipt.id !== id) {
@@ -50,12 +52,22 @@ export function ReceiptDetail() {
   const buyers = receipt.buyers || [];
   const hasBuyers = buyers.length > 0;
 
-  const toggleEditing = () => {
-    if (isEditing) {
-      handleSave();
-    } else {
-      setIsEditing(true);
+  const handleEditStoreName = () => {
+    setEditedStoreName(receipt.storeName);
+    setIsEditingStore(true);
+  };
+
+  const handleSaveStoreName = () => {
+    if (editedStoreName.trim()) {
+      updateStoreName(receipt.id, editedStoreName.trim());
+      setReceipt(prev => ({ ...prev, storeName: editedStoreName.trim() }));
     }
+    setIsEditingStore(false);
+  };
+
+  const handleCancelStoreName = () => {
+    setIsEditingStore(false);
+    setEditedStoreName('');
   };
 
   return (
@@ -70,7 +82,7 @@ export function ReceiptDetail() {
             >
               ← Back
             </button>
-            {!hasBuyers && !isEditing && (
+            {!hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-1"
@@ -79,7 +91,7 @@ export function ReceiptDetail() {
                 <span>Add Buyer</span>
               </button>
             )}
-            {hasBuyers && !isEditing && (
+            {hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
@@ -99,7 +111,41 @@ export function ReceiptDetail() {
 
         {/* Receipt Header */}
         <div className="bg-white rounded-lg shadow p-6 mb-4">
-          <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
+          {isEditingStore ? (
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={editedStoreName}
+                onChange={(e) => setEditedStoreName(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSaveStoreName()}
+                className="flex-1 text-2xl font-bold border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoFocus
+              />
+              <button
+                onClick={handleSaveStoreName}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Save
+              </button>
+              <button
+                onClick={handleCancelStoreName}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
+              <button
+                onClick={handleEditStoreName}
+                className="text-gray-400 hover:text-gray-600 text-2xl"
+                title="Edit store name"
+              >
+                ✏️
+              </button>
+            </div>
+          )}
           <p className="text-gray-500">
             {new Date(receipt.date).toLocaleDateString('sr-RS', {
               year: 'numeric',
