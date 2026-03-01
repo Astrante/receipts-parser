@@ -400,17 +400,13 @@ export function ReceiptDetail() {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {buyers.map((buyer, index) => {
+              {buyers.map((buyer) => {
                 const total = calculateBuyerShare(buyer.id, receipt);
-                const isDefaultBuyer = index === 0;
                 return (
                   <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold">
                         {buyer.name}
-                        {isDefaultBuyer && (
-                          <span className="ml-2 text-xs text-blue-600 font-normal">(buffer)</span>
-                        )}
                       </h3>
                       <button
                         onClick={() => removeBuyer(buyer.id)}
@@ -443,9 +439,6 @@ export function ReceiptDetail() {
                     {buyers.map(buyer => (
                       <th key={buyer.id} className="px-4 py-3 text-center font-semibold min-w-[120px]">
                         {buyer.name}
-                        {buyer.id === firstBuyerId && (
-                          <div className="text-xs text-gray-500 font-normal">(buffer)</div>
-                        )}
                       </th>
                     ))}
                   </tr>
