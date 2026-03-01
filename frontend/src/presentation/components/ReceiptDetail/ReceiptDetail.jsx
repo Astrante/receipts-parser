@@ -1,15 +1,26 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
-import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { calculateBuyerShare, createBuyer } from '../../../core/domain/Buyer.js';
+import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
 
 export function ReceiptDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, receipts, updateStoreName } = useReceiptStore();
+  const { activeReceipt, setActiveReceipt, receipts, updateStoreName, updateBuyers, updateProductDistribution } = useReceiptStore();
   const [receipt, setReceipt] = useState(null);
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [editedStoreName, setEditedStoreName] = useState('');
+  const [newBuyerName, setNewBuyerName] = useState('');
+  const [savedBuyers, setSavedBuyers] = useState([]);
+  const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
+
+  useEffect(() => {
+    const buyers = BuyerRepository.findAll();
+    setSavedBuyers(buyers);
+    const defaultUserName = localStorage.getItem('defaultUserName') || '';
+    setNewBuyerName(defaultUserName);
+  }, []);
 
   useEffect(() => {
     if (!activeReceipt || activeReceipt.id !== id) {
@@ -29,6 +40,176 @@ export function ReceiptDetail() {
       deleteReceipt(id);
       navigate('/');
     }
+  };
+
+  const handleEditStoreName = () => {
+    setEditedStoreName(receipt.storeName);
+    setIsEditingStore(true);
+  };
+
+  const handleSaveStoreName = () => {
+    if (editedStoreName.trim()) {
+      updateStoreName(receipt.id, editedStoreName.trim());
+      setReceipt(prev => ({ ...prev, storeName: editedStoreName.trim() }));
+    }
+    setIsEditingStore(false);
+  };
+
+  const handleCancelStoreName = () => {
+    setIsEditingStore(false);
+    setEditedStoreName('');
+  };
+
+  const addBuyer = () => {
+    if (!newBuyerName.trim()) return;
+
+    const currentBuyers = receipt.buyers || [];
+
+    if (currentBuyers.length === 0) {
+      localStorage.setItem('defaultUserName', newBuyerName.trim());
+    }
+
+    const newBuyer = createBuyer({ name: newBuyerName.trim() });
+    const updatedBuyers = [...currentBuyers, newBuyer];
+
+    BuyerRepository.save(newBuyer);
+    setSavedBuyers(BuyerRepository.findAll());
+
+    if (currentBuyers.length === 0) {
+      const updatedProducts = receipt.products.map(product => ({
+        ...product,
+        distribution: { [newBuyer.id]: product.quantity }
+      }));
+
+      const updatedReceipt = {
+        ...receipt,
+        buyers: updatedBuyers,
+        products: updatedProducts
+      };
+
+      updateBuyers(receipt.id, updatedBuyers);
+      updatedProducts.forEach(product => {
+        updateProductDistribution(receipt.id, product.id, product.distribution);
+      });
+
+      setReceipt(updatedReceipt);
+    } else {
+      const updatedReceipt = {
+        ...receipt,
+        buyers: updatedBuyers
+      };
+
+      updateBuyers(receipt.id, updatedBuyers);
+      setReceipt(updatedReceipt);
+    }
+
+    setNewBuyerName('');
+    setShowBuyerDropdown(false);
+  };
+
+  const selectBuyer = (buyer) => {
+    setNewBuyerName(buyer.name);
+    setShowBuyerDropdown(false);
+  };
+
+  const updateDistribution = (productId, buyerId, newValue) => {
+    const product = receipt.products.find(p => p.id === productId);
+    const currentDist = product.distribution || {};
+    const buyers = receipt.buyers || [];
+
+    if (buyers.length === 0) return;
+
+    const firstBuyerId = buyers[0].id;
+    const isFirstBuyer = buyerId === firstBuyerId;
+
+    const parsedValue = newValue === '' ? 0 : parseFloat(newValue);
+    const oldValue = currentDist[buyerId] || 0;
+
+    let newDistribution = { ...currentDist };
+    newDistribution[buyerId] = parsedValue;
+
+    if (isFirstBuyer) {
+      if (parsedValue < oldValue) {
+        newDistribution[buyerId] = oldValue;
+      } else {
+        const totalOthers = buyers
+          .filter(b => b.id !== firstBuyerId)
+          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
+
+        const maxAllowed = product.quantity - totalOthers;
+        if (parsedValue > maxAllowed) {
+          newDistribution[buyerId] = maxAllowed;
+        }
+      }
+    } else {
+      const difference = parsedValue - oldValue;
+      const firstBuyerCurrentValue = currentDist[firstBuyerId] || 0;
+
+      if (difference > 0) {
+        const canTake = Math.min(firstBuyerCurrentValue, difference);
+        newDistribution[firstBuyerId] = firstBuyerCurrentValue - canTake;
+
+        if (canTake < difference) {
+          newDistribution[buyerId] = oldValue + canTake;
+        }
+      } else {
+        const excess = Math.abs(difference);
+        const firstBuyerNewValue = firstBuyerCurrentValue + excess;
+        const maxFirst = product.quantity - buyers
+          .filter(b => b.id !== firstBuyerId && b.id !== buyerId)
+          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
+
+        newDistribution[firstBuyerId] = Math.min(firstBuyerNewValue, maxFirst);
+      }
+    }
+
+    updateProductDistribution(receipt.id, productId, newDistribution);
+
+    setReceipt(prev => ({
+      ...prev,
+      products: prev.products.map(p =>
+        p.id === productId ? { ...p, distribution: newDistribution } : p
+      )
+    }));
+  };
+
+  const handleInputChange = (productId, buyerId, value) => {
+    if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) >= 0)) {
+      updateDistribution(productId, buyerId, value);
+    }
+  };
+
+  const getInputValue = (productId, buyerId, actualValue) => {
+    return actualValue === 0 ? '' : actualValue;
+  };
+
+  const removeBuyer = (buyerId) => {
+    const buyers = receipt.buyers || [];
+
+    if (buyers.length > 0 && buyers[0].id === buyerId) {
+      alert('Cannot remove the first buyer');
+      return;
+    }
+
+    const updatedBuyers = buyers.filter(b => b.id !== buyerId);
+    updateBuyers(receipt.id, updatedBuyers);
+
+    receipt.products.forEach(product => {
+      const currentDist = product.distribution || {};
+      const firstBuyerId = buyers[0].id;
+      const removedBuyerShare = currentDist[buyerId] || 0;
+
+      const newDist = { ...currentDist };
+      delete newDist[buyerId];
+
+      if (removedBuyerShare > 0) {
+        newDist[firstBuyerId] = (newDist[firstBuyerId] || 0) + removedBuyerShare;
+      }
+
+      updateProductDistribution(receipt.id, product.id, newDist);
+    });
+
+    setReceipt(prev => ({ ...prev, buyers: updatedBuyers }));
   };
 
   if (!receipt) {
@@ -51,28 +232,21 @@ export function ReceiptDetail() {
 
   const buyers = receipt.buyers || [];
   const hasBuyers = buyers.length > 0;
+  const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
 
-  const handleEditStoreName = () => {
-    setEditedStoreName(receipt.storeName);
-    setIsEditingStore(true);
-  };
-
-  const handleSaveStoreName = () => {
-    if (editedStoreName.trim()) {
-      updateStoreName(receipt.id, editedStoreName.trim());
-      setReceipt(prev => ({ ...prev, storeName: editedStoreName.trim() }));
-    }
-    setIsEditingStore(false);
-  };
-
-  const handleCancelStoreName = () => {
-    setIsEditingStore(false);
-    setEditedStoreName('');
+  const formatDateTime = (date) => {
+    return new Date(date).toLocaleString('sr-RS', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-4 flex justify-between items-start">
           <div className="flex items-center gap-4">
@@ -147,17 +321,91 @@ export function ReceiptDetail() {
             </div>
           )}
           <p className="text-gray-500">
-            {new Date(receipt.date).toLocaleDateString('sr-RS', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}
+            {formatDateTime(receipt.date)}
           </p>
         </div>
 
-        {/* Products List with Buyers - when buyers exist */}
+        {/* Add Buyers - always show when has buyers */}
+        {hasBuyers && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Buyers</h2>
+            <div className="relative">
+              <div className="flex gap-2 mb-4">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={newBuyerName}
+                    onChange={(e) => {
+                      setNewBuyerName(e.target.value);
+                      setShowBuyerDropdown(e.target.value.length > 0);
+                    }}
+                    onFocus={() => setShowBuyerDropdown(true)}
+                    placeholder="Buyer name or select from list"
+                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                    autoComplete="off"
+                  />
+                  {showBuyerDropdown && savedBuyers.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {savedBuyers
+                        .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
+                        .map(buyer => (
+                          <div
+                            key={buyer.id}
+                            onClick={() => selectBuyer(buyer)}
+                            className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                          >
+                            <div className="font-medium">{buyer.name}</div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  onClick={addBuyer}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <span className="text-lg leading-none">+</span>
+                  <span>Add Buyer</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {buyers.map((buyer, index) => {
+                const total = calculateBuyerShare(buyer.id, receipt);
+                const isDefaultBuyer = index === 0;
+                return (
+                  <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold">
+                        {buyer.name}
+                        {isDefaultBuyer && (
+                          <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
+                        )}
+                      </h3>
+                      {!isDefaultBuyer && (
+                        <button
+                          onClick={() => removeBuyer(buyer.id)}
+                          className="text-red-500 hover:text-red-700 text-sm font-bold"
+                        >
+                          ×
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-lg font-bold text-blue-600">
+                      {total.toFixed(2)} RSD
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Product Distribution Table */}
         {hasBuyers ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
+          <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
@@ -169,7 +417,7 @@ export function ReceiptDetail() {
                     {buyers.map(buyer => (
                       <th key={buyer.id} className="px-4 py-3 text-center font-semibold min-w-[120px]">
                         {buyer.name}
-                        {buyers.indexOf(buyer) === 0 && (
+                        {buyer.id === firstBuyerId && (
                           <div className="text-xs text-gray-500 font-normal">(buffer)</div>
                         )}
                       </th>
@@ -197,11 +445,30 @@ export function ReceiptDetail() {
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
+                          const inputValue = getInputValue(product.id, buyer.id, share);
+                          const isFirstBuyerColumn = buyer.id === firstBuyerId;
+
                           return (
                             <td key={buyer.id} className="px-4 py-3 text-center">
-                              <div className="text-gray-700">
-                                {share > 0 ? share.toFixed(2) : '-'}
-                              </div>
+                              <input
+                                type="number"
+                                min="0"
+                                max={isFirstBuyerColumn ? product.quantity : product.quantity}
+                                step="0.01"
+                                value={inputValue}
+                                onChange={(e) => handleInputChange(
+                                  product.id,
+                                  buyer.id,
+                                  e.target.value
+                                )}
+                                onFocus={(e) => e.target.select()}
+                                placeholder="0"
+                                className={`w-20 border p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                  isFirstBuyerColumn
+                                    ? 'border-blue-300 bg-blue-50'
+                                    : 'border-gray-300'
+                                }`}
+                              />
                               <div className="text-xs text-gray-500 mt-1">
                                 {(share * unitPrice).toFixed(2)} RSD
                               </div>
