@@ -6,8 +6,9 @@ import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 export function ReceiptDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, receipts } = useReceiptStore();
+  const { activeReceipt, setActiveReceipt, receipts, updateBuyers, updateProductDistribution } = useReceiptStore();
   const [receipt, setReceipt] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!activeReceipt || activeReceipt.id !== id) {
@@ -27,6 +28,10 @@ export function ReceiptDetail() {
       deleteReceipt(id);
       navigate('/');
     }
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
   };
 
   if (!receipt) {
@@ -50,6 +55,14 @@ export function ReceiptDetail() {
   const buyers = receipt.buyers || [];
   const hasBuyers = buyers.length > 0;
 
+  const toggleEditing = () => {
+    if (isEditing) {
+      handleSave();
+    } else {
+      setIsEditing(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-4xl mx-auto">
@@ -62,12 +75,23 @@ export function ReceiptDetail() {
             >
               ← Back
             </button>
-            <button
-              onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-              className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
-            >
-              Split Receipt
-            </button>
+            {!isEditing && (
+              <button
+                onClick={toggleEditing}
+                className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-1"
+              >
+                <span className="text-lg leading-none">+</span>
+                <span>Add Buyer</span>
+              </button>
+            )}
+            {isEditing && (
+              <button
+                onClick={handleSave}
+                className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+              >
+                Save
+              </button>
+            )}
           </div>
           <button
             onClick={handleDelete}

@@ -79,23 +79,35 @@ export function ReceiptList() {
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow relative"
                 >
-                  <div className="flex justify-between items-start">
-                    <div
-                      onClick={() => navigate(`/receipt/${receipt.id}`)}
-                      className="flex-1 cursor-pointer"
-                    >
-                      <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
-                      <p className="text-gray-500 text-sm mt-1">
-                        {new Date(receipt.date).toLocaleDateString('sr-RS', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        })}
-                      </p>
-                      <p className="text-gray-500 text-sm mt-2">
-                        {receipt.products.length} items
+                  <button
+                    onClick={(e) => handleDelete(receipt.id, e)}
+                    className="absolute top-4 right-4 text-red-500 hover:text-red-700 text-xl font-bold leading-none"
+                    title="Delete receipt"
+                  >
+                    ×
+                  </button>
+                  <div
+                    onClick={() => navigate(`/receipt/${receipt.id}`)}
+                    className="cursor-pointer pr-8"
+                  >
+                    <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      {new Date(receipt.date).toLocaleDateString('sr-RS', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                      })}
+                    </p>
+                    <p className="text-gray-500 text-sm mt-2">
+                      {receipt.products.length} items
+                    </p>
+                  </div>
+                  <div className="mt-3 flex justify-end items-start">
+                    <div className="text-right">
+                      <p className="font-bold text-xl text-gray-800">
+                        {receipt.totalAmount.toFixed(2)} RSD
                       </p>
                       {buyersBreakdown && (
                         <div className="mt-2 space-y-1">
@@ -106,18 +118,6 @@ export function ReceiptList() {
                           ))}
                         </div>
                       )}
-                    </div>
-                    <div className="flex flex-col items-end gap-2 ml-4">
-                      <p className="font-bold text-xl text-gray-800">
-                        {receipt.totalAmount.toFixed(2)} RSD
-                      </p>
-                      <button
-                        onClick={(e) => handleDelete(receipt.id, e)}
-                        className="text-red-500 hover:text-red-700 text-xl font-bold leading-none"
-                        title="Delete receipt"
-                      >
-                        ×
-                      </button>
                     </div>
                   </div>
                 </div>
