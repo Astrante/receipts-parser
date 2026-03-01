@@ -45,6 +45,16 @@ export function ReceiptList() {
     return createdB - createdA;
   });
 
+  const formatDateTime = (date) => {
+    return new Date(date).toLocaleString('sr-RS', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-2xl mx-auto">
@@ -98,11 +108,7 @@ export function ReceiptList() {
                       <div className="flex-1">
                         <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
                         <p className="text-gray-500 text-sm mt-1">
-                          {new Date(receipt.date).toLocaleDateString('sr-RS', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
+                          {formatDateTime(receipt.date)}
                         </p>
                         <p className="text-gray-500 text-sm mt-2">
                           {receipt.products.length} items
