@@ -9,15 +9,14 @@ export function SplitReceipt() {
   const navigate = useNavigate();
   const { activeReceipt, setActiveReceipt, updateBuyers, updateProductDistribution, receipts } = useReceiptStore();
   const [receipt, setReceipt] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
   const [newBuyerName, setNewBuyerName] = useState('');
   const [savedBuyers, setSavedBuyers] = useState([]);
   const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
 
-  // Load saved buyers and default user name
   useEffect(() => {
     const buyers = BuyerRepository.findAll();
     setSavedBuyers(buyers);
-
     const defaultUserName = localStorage.getItem('defaultUserName') || '';
     setNewBuyerName(defaultUserName);
   }, []);
@@ -34,12 +33,20 @@ export function SplitReceipt() {
     }
   }, [id, activeReceipt, receipts, setActiveReceipt]);
 
+  const toggleEditing = () => {
+    if (isEditing) {
+      setIsEditing(false);
+      setNewBuyerName(''); // Clear input when exiting edit mode
+    } else {
+      setIsEditing(true);
+    }
+  };
+
   const addBuyer = () => {
     if (!newBuyerName.trim()) return;
 
     const currentBuyers = receipt.buyers || [];
 
-    // Save default user name
     if (currentBuyers.length === 0) {
       localStorage.setItem('defaultUserName', newBuyerName.trim());
     }
@@ -47,11 +54,9 @@ export function SplitReceipt() {
     const newBuyer = createBuyer({ name: newBuyerName.trim() });
     const updatedBuyers = [...currentBuyers, newBuyer];
 
-    // Save to repository
     BuyerRepository.save(newBuyer);
     setSavedBuyers(BuyerRepository.findAll());
 
-    // Initialize distribution: all products to first buyer
     if (currentBuyers.length === 0) {
       const updatedProducts = receipt.products.map(product => ({
         ...product,
@@ -80,7 +85,6 @@ export function SplitReceipt() {
       setReceipt(updatedReceipt);
     }
 
-    // Clear input and hide dropdown
     setNewBuyerName('');
     setShowBuyerDropdown(false);
   };
@@ -91,6 +95,8 @@ export function SplitReceipt() {
   };
 
   const updateDistribution = (productId, buyerId, newValue) => {
+    if (!isEditing) return; // Only allow editing in edit mode
+
     const product = receipt.products.find(p => p.id === productId);
     const currentDist = product.distribution || {};
     const buyers = receipt.buyers || [];
@@ -210,94 +216,135 @@ export function SplitReceipt() {
 
   const buyers = receipt.buyers || [];
   const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
-  const defaultUserName = localStorage.getItem('defaultUserName') || '';
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-4 flex justify-between items-start">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate(`/receipt/${receipt.id}`)}
+              className="text-blue-500 hover:text-blue-700"
+            >
+              ← Back
+            </button>
+            {isEditing && (
+              <div className="flex items-center gap-2 bg-blue-50 px-3 py-1 rounded">
+                <span className="text-sm text-blue-600 font-medium">Editing mode</span>
+              </div>
+            )}
+          </div>
           <button
-            onClick={() => navigate(`/receipt/${receipt.id}`)}
-            className="text-blue-500 hover:text-blue-700"
+            onClick={toggleEditing}
+            className={`${isEditing ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors`}
           >
-            ← Back to Receipt
+            {isEditing ? 'Save' : 'Edit'}
           </button>
         </div>
 
         <h1 className="text-3xl font-bold mb-6">Split Receipt</h1>
 
-        {/* Add Buyers */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Buyers</h2>
-          <div className="relative">
-            <div className="flex gap-2 mb-4">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  value={newBuyerName}
-                  onChange={(e) => {
-                    setNewBuyerName(e.target.value);
-                    setShowBuyerDropdown(e.target.value.length > 0);
-                  }}
-                  onFocus={() => setShowBuyerDropdown(true)}
-                  placeholder={buyers.length === 0 ? "Your name (default buyer)" : "Buyer name or select from list"}
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
-                  autoComplete="off"
-                />
-                {showBuyerDropdown && savedBuyers.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    {savedBuyers
-                      .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
-                      .map(buyer => (
-                        <div
-                          key={buyer.id}
-                          onClick={() => selectBuyer(buyer)}
-                          className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
-                        >
-                          <div className="font-medium">{buyer.name}</div>
-                        </div>
-                      ))}
+        {/* Add Buyers - only in editing mode */}
+        {isEditing && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Buyers</h2>
+            <div className="relative">
+              <div className="flex gap-2 mb-4">
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={newBuyerName}
+                    onChange={(e) => {
+                      setNewBuyerName(e.target.value);
+                      setShowBuyerDropdown(e.target.value.length > 0);
+                    }}
+                    onFocus={() => setShowBuyerDropdown(true)}
+                    placeholder={buyers.length === 0 ? "Your name (default buyer)" : "Buyer name or select from list"}
+                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                    autoComplete="off"
+                  />
+                  {showBuyerDropdown && savedBuyers.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                      {savedBuyers
+                        .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
+                        .map(buyer => (
+                          <div
+                            key={buyer.id}
+                            onClick={() => selectBuyer(buyer)}
+                            className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                          >
+                            <div className="font-medium">{buyer.name}</div>
+                          </div>
+                        ))}
                     </div>
                   )}
+                </div>
+                <button
+                  onClick={addBuyer}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-1"
+                >
+                  <span className="text-lg leading-none">+</span>
+                  <span>Add Buyer</span>
+                </button>
               </div>
-              <button
-                onClick={addBuyer}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
-              >
-                {buyers.length === 0 ? 'Start Splitting' : 'Add Buyer'}
-              </button>
             </div>
-          </div>
 
-          {buyers.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
-              Add your name to start splitting the receipt
-            </p>
-          ) : (
+            {buyers.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                Add your name to start splitting the receipt
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {buyers.map((buyer, index) => {
+                  const total = calculateBuyerShare(buyer.id, receipt);
+                  const isDefaultBuyer = index === 0;
+                  return (
+                    <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-semibold">
+                          {buyer.name}
+                          {isDefaultBuyer && (
+                            <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
+                          )}
+                        </h3>
+                        {!isDefaultBuyer && (
+                          <button
+                            onClick={() => removeBuyer(buyer.id)}
+                            className="text-red-500 hover:text-red-700 text-sm font-bold"
+                          >
+                            ×
+                          </button>
+                        )}
+                      </div>
+                      <p className="text-lg font-bold text-blue-600">
+                        {total.toFixed(2)} RSD
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Show buyers summary when not editing */}
+        {!isEditing && buyers.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold mb-4">Buyers</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {buyers.map((buyer, index) => {
                 const total = calculateBuyerShare(buyer.id, receipt);
                 const isDefaultBuyer = index === 0;
                 return (
                   <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold">
-                        {buyer.name}
-                        {isDefaultBuyer && (
-                          <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
-                        )}
-                      </h3>
-                      {!isDefaultBuyer && (
-                        <button
-                          onClick={() => removeBuyer(buyer.id)}
-                          className="text-red-500 hover:text-red-700 text-sm font-bold"
-                        >
-                          ×
-                        </button>
+                    <h3 className="font-semibold">
+                      {buyer.name}
+                      {isDefaultBuyer && (
+                        <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
                       )}
-                    </div>
+                    </h3>
                     <p className="text-lg font-bold text-blue-600">
                       {total.toFixed(2)} RSD
                     </p>
@@ -305,8 +352,8 @@ export function SplitReceipt() {
                 );
               })}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Product Distribution Table */}
         {buyers.length > 0 && (
@@ -355,25 +402,31 @@ export function SplitReceipt() {
 
                           return (
                             <td key={buyer.id} className="px-4 py-3 text-center">
-                              <input
-                                type="number"
-                                min="0"
-                                max={isFirstBuyerColumn ? product.quantity : product.quantity}
-                                step="0.01"
-                                value={inputValue}
-                                onChange={(e) => handleInputChange(
-                                  product.id,
-                                  buyer.id,
-                                  e.target.value
-                                )}
-                                onFocus={(e) => e.target.select()}
-                                placeholder="0"
-                                className={`w-20 border p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  isFirstBuyerColumn
-                                    ? 'border-blue-300 bg-blue-50'
-                                    : 'border-gray-300'
-                                }`}
-                              />
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  min="0"
+                                  max={isFirstBuyerColumn ? product.quantity : product.quantity}
+                                  step="0.01"
+                                  value={inputValue}
+                                  onChange={(e) => handleInputChange(
+                                    product.id,
+                                    buyer.id,
+                                    e.target.value
+                                  )}
+                                  onFocus={(e) => e.target.select()}
+                                  placeholder="0"
+                                  className={`w-20 border p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                                    isFirstBuyerColumn
+                                      ? 'border-blue-300 bg-blue-50'
+                                      : 'border-gray-300'
+                                  }`}
+                                />
+                              ) : (
+                                <div className="text-gray-700">
+                                  {share > 0 ? share.toFixed(2) : '-'}
+                                </div>
+                              )}
                               <div className="text-xs text-gray-500 mt-1">
                                 {(share * unitPrice).toFixed(2)} RSD
                               </div>
