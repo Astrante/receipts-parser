@@ -6,9 +6,8 @@ import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 export function ReceiptDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, receipts, updateBuyers, updateProductDistribution } = useReceiptStore();
+  const { activeReceipt, setActiveReceipt, receipts } = useReceiptStore();
   const [receipt, setReceipt] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!activeReceipt || activeReceipt.id !== id) {
@@ -28,10 +27,6 @@ export function ReceiptDetail() {
       deleteReceipt(id);
       navigate('/');
     }
-  };
-
-  const handleSave = () => {
-    setIsEditing(false);
   };
 
   if (!receipt) {
@@ -75,21 +70,21 @@ export function ReceiptDetail() {
             >
               ← Back
             </button>
-            {!isEditing && (
+            {!hasBuyers && !isEditing && (
               <button
-                onClick={toggleEditing}
+                onClick={() => navigate(`/receipt/${receipt.id}/split`)}
                 className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-1"
               >
                 <span className="text-lg leading-none">+</span>
                 <span>Add Buyer</span>
               </button>
             )}
-            {isEditing && (
+            {hasBuyers && !isEditing && (
               <button
-                onClick={handleSave}
-                className="bg-green-500 hover:bg-green-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+                onClick={() => navigate(`/receipt/${receipt.id}/split`)}
+                className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
               >
-                Save
+                Edit Split
               </button>
             )}
           </div>
@@ -114,54 +109,112 @@ export function ReceiptDetail() {
           </p>
         </div>
 
-        {/* Buyers Breakdown */}
-        {hasBuyers && (
-          <div className="bg-white rounded-lg shadow p-6 mb-4">
-            <h2 className="text-lg font-semibold mb-3">Split Between</h2>
-            <div className="space-y-2">
-              {buyers.map(buyer => {
-                const total = calculateBuyerShare(buyer.id, receipt);
-                return (
-                  <div key={buyer.id} className="flex justify-between items-center py-2 border-b last:border-b-0">
-                    <span className="text-gray-700">{buyer.name}</span>
-                    <span className="font-bold text-blue-600">{total.toFixed(2)} RSD</span>
-                  </div>
-                );
-              })}
+        {/* Products List with Buyers - when buyers exist */}
+        {hasBuyers ? (
+          <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-semibold">Product</th>
+                    <th className="px-4 py-3 text-right font-semibold">Qty</th>
+                    <th className="px-4 py-3 text-right font-semibold">Unit Price</th>
+                    <th className="px-4 py-3 text-right font-semibold">Total</th>
+                    {buyers.map(buyer => (
+                      <th key={buyer.id} className="px-4 py-3 text-center font-semibold min-w-[120px]">
+                        {buyer.name}
+                        {buyers.indexOf(buyer) === 0 && (
+                          <div className="text-xs text-gray-500 font-normal">(buffer)</div>
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {receipt.products.map(product => {
+                    const unitPrice = product.total / product.quantity;
+                    const currentDist = product.distribution || {};
+
+                    return (
+                      <tr key={product.id}>
+                        <td className="px-4 py-3">
+                          <div className="font-medium">{product.name}</div>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {product.quantity} {product.unit}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {unitPrice.toFixed(2)}
+                        </td>
+                        <td className="px-4 py-3 text-right font-semibold">
+                          {product.total.toFixed(2)}
+                        </td>
+                        {buyers.map(buyer => {
+                          const share = currentDist[buyer.id] || 0;
+                          return (
+                            <td key={buyer.id} className="px-4 py-3 text-center">
+                              <div className="text-gray-700">
+                                {share > 0 ? share.toFixed(2) : '-'}
+                              </div>
+                              <div className="text-xs text-gray-500 mt-1">
+                                {(share * unitPrice).toFixed(2)} RSD
+                              </div>
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot className="bg-gray-50 border-t-2">
+                  <tr>
+                    <td className="px-4 py-3 text-right font-bold text-lg" colSpan="3">
+                      Total:
+                    </td>
+                    <td className="px-4 py-3 text-right font-bold text-lg">
+                      {receipt.totalAmount.toFixed(2)} RSD
+                    </td>
+                    {buyers.map(buyer => {
+                      const total = calculateBuyerShare(buyer.id, receipt);
+                      return (
+                        <td key={buyer.id} className="px-4 py-3 text-right font-bold text-lg text-blue-600">
+                          {total.toFixed(2)} RSD
+                        </td>
+                      );
+                    })}
+                  </tr>
+                </tfoot>
+              </table>
             </div>
-            <div className="mt-3 pt-3 border-t flex justify-between items-center">
-              <span className="font-bold">Total</span>
-              <span className="font-bold text-lg text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
+          </div>
+        ) : (
+          /* Products List - simple view when no buyers */
+          <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
+            <div className="p-4 bg-gray-50 border-b">
+              <h2 className="font-semibold text-lg">Products ({receipt.products.length})</h2>
+            </div>
+            <div className="divide-y">
+              {receipt.products.map((product) => (
+                <div key={product.id} className="p-4 flex justify-between items-center">
+                  <div className="flex-1">
+                    <h3 className="font-medium text-gray-800">{product.name}</h3>
+                    <p className="text-sm text-gray-500">
+                      {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)} RSD
+                    </p>
+                    {product.taxRate > 0 && (
+                      <span className="text-xs text-gray-400">
+                        VAT: {product.taxRate}%
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="font-bold text-lg">{product.total.toFixed(2)} RSD</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
-
-        {/* Products List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
-          <div className="p-4 bg-gray-50 border-b">
-            <h2 className="font-semibold text-lg">Products ({receipt.products.length})</h2>
-          </div>
-          <div className="divide-y">
-            {receipt.products.map((product) => (
-              <div key={product.id} className="p-4 flex justify-between items-center">
-                <div className="flex-1">
-                  <h3 className="font-medium text-gray-800">{product.name}</h3>
-                  <p className="text-sm text-gray-500">
-                    {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)} RSD
-                  </p>
-                  {product.taxRate > 0 && (
-                    <span className="text-xs text-gray-400">
-                      VAT: {product.taxRate}%
-                    </span>
-                  )}
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-lg">{product.total.toFixed(2)} RSD</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Summary */}
         <div className="bg-white rounded-lg shadow p-6 mb-4">
