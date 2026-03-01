@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: receipt-parser-backend
+    env: node
+    buildCommand: npm install
+    startCommand: node src/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: FRONTEND_URL
+        value: https://[username].github.io/receipt-parser/  # Замените на ваш GitHub Pages URL

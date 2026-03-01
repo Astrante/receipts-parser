@@ -1,0 +1,21 @@
+{
+  "name": "recieptparser",
+  "version": "1.0.0",
+  "description": "Receipt Parser - Scan and split Serbian receipts",
+  "scripts": {
+    "backend": "node backend/src/server.js",
+    "backend:dev": "nodemon backend/src/server.js",
+    "frontend": "cd frontend && npm run dev",
+    "frontend:build": "cd frontend && npm run build",
+    "dev": "npm run backend:dev",
+    "vercel-build": "cd frontend && npm install && npm run build"
+  },
+  "keywords": ["receipt", "parser", "qr-scanner", "serbia"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "gh-pages": "^6.3.0",
+    "nodemon": "^3.1.14"
+  }
+}

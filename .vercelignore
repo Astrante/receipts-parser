@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+backend/node_modules
+
+# Build outputs
+dist
+build
+
+# Environment files
+.env
+.env.local
+.env.development.local
+
+# Development files
+.vscode
+.idea
+*.log
+.DS_Store
+
+# Documentation (optional - remove if you want to include in deploy)
+*.md
+.git
+.gitignore
+
+# Backend (не нужен для Vercel, используем serverless функции)
+backend/src
