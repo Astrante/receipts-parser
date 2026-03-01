@@ -15,19 +15,6 @@ export function ReceiptList() {
     setDefaultUserName(defaultName);
   }, [loadReceipts]);
 
-  const getUserShare = (receipt) => {
-    if (!receipt.buyers || receipt.buyers.length === 0) {
-      return receipt.totalAmount;
-    }
-
-    if (receipt.buyers.length === 1) {
-      const buyer = receipt.buyers[0];
-      return calculateBuyerShare(buyer.id, receipt);
-    }
-
-    return null;
-  };
-
   const getBuyersBreakdown = (receipt) => {
     if (!receipt.buyers || receipt.buyers.length === 0) {
       return null;
@@ -53,7 +40,6 @@ export function ReceiptList() {
     if (dateA !== dateB) {
       return dateB - dateA; // Most recent first
     }
-    // If same date, sort by creation time
     const createdA = new Date(a.createdAt || 0).getTime();
     const createdB = new Date(b.createdAt || 0).getTime();
     return createdB - createdA;
@@ -88,25 +74,24 @@ export function ReceiptList() {
         ) : (
           <div className="space-y-4">
             {sortedReceipts.map((receipt) => {
-              const userShare = getUserShare(receipt);
               const buyersBreakdown = getBuyersBreakdown(receipt);
 
               return (
                 <div
                   key={receipt.id}
-                  onClick={() => navigate(`/receipt/${receipt.id}`)}
-                  className="bg-white rounded-lg shadow p-4 cursor-pointer hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-shadow"
                 >
                   <div className="flex justify-between items-start">
-                    <div className="flex-1">
+                    <div
+                      onClick={() => navigate(`/receipt/${receipt.id}`)}
+                      className="flex-1 cursor-pointer"
+                    >
                       <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
                       <p className="text-gray-500 text-sm mt-1">
                         {new Date(receipt.date).toLocaleDateString('sr-RS', {
                           year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
+                          month: 'short',
+                          day: 'numeric'
                         })}
                       </p>
                       <p className="text-gray-500 text-sm mt-2">
@@ -122,20 +107,16 @@ export function ReceiptList() {
                         </div>
                       )}
                     </div>
-                    <div className="text-right flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-2 ml-4">
                       <p className="font-bold text-xl text-gray-800">
                         {receipt.totalAmount.toFixed(2)} RSD
                       </p>
-                      {buyersBreakdown && buyersBreakdown.length > 1 && (
-                        <div className="text-xs text-gray-400">
-                          {buyersBreakdown.length} people
-                        </div>
-                      )}
                       <button
                         onClick={(e) => handleDelete(receipt.id, e)}
-                        className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        className="text-red-500 hover:text-red-700 text-xl font-bold leading-none"
+                        title="Delete receipt"
                       >
-                        Delete
+                        ×
                       </button>
                     </div>
                   </div>
