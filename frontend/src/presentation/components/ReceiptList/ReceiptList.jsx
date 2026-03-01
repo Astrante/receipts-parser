@@ -89,15 +89,15 @@ export function ReceiptList() {
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow group"
                 >
-                  <div className="p-4 pb-2 flex justify-end">
+                  <div className="p-4 pb-2 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={(e) => handleDelete(receipt.id, e)}
-                      className="text-red-500 hover:text-red-700 text-2xl font-bold leading-none p-1"
+                      className="text-gray-400 hover:text-red-500 hover:bg-red-50 text-base leading-none p-2 rounded-lg transition-all"
                       title="Delete receipt"
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                   <div
