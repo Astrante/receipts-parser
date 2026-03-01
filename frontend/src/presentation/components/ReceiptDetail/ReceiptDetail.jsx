@@ -10,7 +10,6 @@ export function ReceiptDetail() {
   const [receipt, setReceipt] = useState(null);
 
   useEffect(() => {
-    // Если активный чек не соответствует ID, ищем в списке
     if (!activeReceipt || activeReceipt.id !== id) {
       const found = receipts.find(r => r.id === id);
       if (found) {
@@ -21,6 +20,14 @@ export function ReceiptDetail() {
       setReceipt(activeReceipt);
     }
   }, [id, activeReceipt, receipts, setActiveReceipt]);
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this receipt?')) {
+      const { deleteReceipt } = useReceiptStore.getState();
+      deleteReceipt(id);
+      navigate('/');
+    }
+  };
 
   if (!receipt) {
     return (
@@ -40,25 +47,34 @@ export function ReceiptDetail() {
     );
   }
 
-  const buyerCount = receipt.buyers?.length || 0;
+  const buyers = receipt.buyers || [];
+  const hasBuyers = buyers.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-4 flex justify-between items-start">
           <button
             onClick={() => navigate('/')}
             className="text-blue-500 hover:text-blue-700"
           >
             ← Back to Receipts
           </button>
-          <button
-            onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-            className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            Split Receipt
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate(`/receipt/${receipt.id}/split`)}
+              className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              Split Receipt
+            </button>
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              Delete
+            </button>
+          </div>
         </div>
 
         {/* Receipt Header */}
@@ -72,6 +88,28 @@ export function ReceiptDetail() {
             })}
           </p>
         </div>
+
+        {/* Buyers Breakdown */}
+        {hasBuyers && (
+          <div className="bg-white rounded-lg shadow p-6 mb-4">
+            <h2 className="text-lg font-semibold mb-3">Split Between</h2>
+            <div className="space-y-2">
+              {buyers.map(buyer => {
+                const total = calculateBuyerShare(buyer.id, receipt);
+                return (
+                  <div key={buyer.id} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                    <span className="text-gray-700">{buyer.name}</span>
+                    <span className="font-bold text-blue-600">{total.toFixed(2)} RSD</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-3 pt-3 border-t flex justify-between items-center">
+              <span className="font-bold">Total</span>
+              <span className="font-bold text-lg text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
+            </div>
+          </div>
+        )}
 
         {/* Products List */}
         <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
