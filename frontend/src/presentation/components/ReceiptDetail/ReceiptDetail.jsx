@@ -18,8 +18,6 @@ export function ReceiptDetail() {
   useEffect(() => {
     const buyers = BuyerRepository.findAll();
     setSavedBuyers(buyers);
-    const defaultUserName = localStorage.getItem('defaultUserName') || '';
-    setNewBuyerName(defaultUserName);
   }, []);
 
   useEffect(() => {
@@ -64,10 +62,6 @@ export function ReceiptDetail() {
     if (!newBuyerName.trim()) return;
 
     const currentBuyers = receipt.buyers || [];
-
-    if (currentBuyers.length === 0) {
-      localStorage.setItem('defaultUserName', newBuyerName.trim());
-    }
 
     const newBuyer = createBuyer({ name: newBuyerName.trim() });
     const updatedBuyers = [...currentBuyers, newBuyer];
@@ -186,29 +180,63 @@ export function ReceiptDetail() {
   const removeBuyer = (buyerId) => {
     const buyers = receipt.buyers || [];
 
-    if (buyers.length > 0 && buyers[0].id === buyerId) {
-      alert('Cannot remove the first buyer');
-      return;
+    if (buyers.length === 0) return;
+
+    const firstBuyerId = buyers[0].id;
+    const isRemovingFirst = buyerId === firstBuyerId;
+
+    let updatedBuyers;
+
+    if (isRemovingFirst) {
+      // Remove first buyer
+      if (buyers.length === 1) {
+        // Last buyer, just remove
+        updatedBuyers = [];
+      } else {
+        // Next buyer becomes first
+        updatedBuyers = buyers.filter(b => b.id !== buyerId);
+        const newFirstBuyerId = updatedBuyers[0].id;
+
+        // Reassign all distributions: old first buyer's share goes to new first buyer
+        receipt.products.forEach(product => {
+          const currentDist = product.distribution || {};
+          const removedShare = currentDist[firstBuyerId] || 0;
+
+          const newDist = {};
+          // Copy all distributions except removed buyer
+          Object.keys(currentDist).forEach(key => {
+            if (key !== buyerId) {
+              newDist[key] = currentDist[key];
+            }
+          });
+
+          // All of removed first buyer's share goes to new first buyer
+          const currentNewFirstShare = newDist[newFirstBuyerId] || 0;
+          newDist[newFirstBuyerId] = currentNewFirstShare + removedShare;
+
+          updateProductDistribution(receipt.id, product.id, newDist);
+        });
+      }
+    } else {
+      // Remove non-first buyer - their share goes to first buyer
+      updatedBuyers = buyers.filter(b => b.id !== buyerId);
+
+      receipt.products.forEach(product => {
+        const currentDist = product.distribution || {};
+        const removedBuyerShare = currentDist[buyerId] || 0;
+
+        const newDist = { ...currentDist };
+        delete newDist[buyerId];
+
+        if (removedBuyerShare > 0) {
+          newDist[firstBuyerId] = (newDist[firstBuyerId] || 0) + removedBuyerShare;
+        }
+
+        updateProductDistribution(receipt.id, product.id, newDist);
+      });
     }
 
-    const updatedBuyers = buyers.filter(b => b.id !== buyerId);
     updateBuyers(receipt.id, updatedBuyers);
-
-    receipt.products.forEach(product => {
-      const currentDist = product.distribution || {};
-      const firstBuyerId = buyers[0].id;
-      const removedBuyerShare = currentDist[buyerId] || 0;
-
-      const newDist = { ...currentDist };
-      delete newDist[buyerId];
-
-      if (removedBuyerShare > 0) {
-        newDist[firstBuyerId] = (newDist[firstBuyerId] || 0) + removedBuyerShare;
-      }
-
-      updateProductDistribution(receipt.id, product.id, newDist);
-    });
-
     setReceipt(prev => ({ ...prev, buyers: updatedBuyers }));
   };
 
@@ -381,17 +409,15 @@ export function ReceiptDetail() {
                       <h3 className="font-semibold">
                         {buyer.name}
                         {isDefaultBuyer && (
-                          <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
+                          <span className="ml-2 text-xs text-blue-600 font-normal">(buffer)</span>
                         )}
                       </h3>
-                      {!isDefaultBuyer && (
-                        <button
-                          onClick={() => removeBuyer(buyer.id)}
-                          className="text-red-500 hover:text-red-700 text-sm font-bold"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        onClick={() => removeBuyer(buyer.id)}
+                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                      >
+                        ×
+                      </button>
                     </div>
                     <p className="text-lg font-bold text-blue-600">
                       {total.toFixed(2)} RSD

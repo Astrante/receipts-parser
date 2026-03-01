@@ -16,8 +16,6 @@ export function SplitReceipt() {
   useEffect(() => {
     const buyers = BuyerRepository.findAll();
     setSavedBuyers(buyers);
-    const defaultUserName = localStorage.getItem('defaultUserName') || '';
-    setNewBuyerName(defaultUserName);
   }, []);
 
   useEffect(() => {
@@ -36,10 +34,6 @@ export function SplitReceipt() {
     if (!newBuyerName.trim()) return;
 
     const currentBuyers = receipt.buyers || [];
-
-    if (currentBuyers.length === 0) {
-      localStorage.setItem('defaultUserName', newBuyerName.trim());
-    }
 
     const newBuyer = createBuyer({ name: newBuyerName.trim() });
     const updatedBuyers = [...currentBuyers, newBuyer];
@@ -158,29 +152,63 @@ export function SplitReceipt() {
   const removeBuyer = (buyerId) => {
     const buyers = receipt.buyers || [];
 
-    if (buyers.length > 0 && buyers[0].id === buyerId) {
-      alert('Cannot remove the first buyer');
-      return;
+    if (buyers.length === 0) return;
+
+    const firstBuyerId = buyers[0].id;
+    const isRemovingFirst = buyerId === firstBuyerId;
+
+    let updatedBuyers;
+
+    if (isRemovingFirst) {
+      // Remove first buyer
+      if (buyers.length === 1) {
+        // Last buyer, just remove
+        updatedBuyers = [];
+      } else {
+        // Next buyer becomes first
+        updatedBuyers = buyers.filter(b => b.id !== buyerId);
+        const newFirstBuyerId = updatedBuyers[0].id;
+
+        // Reassign all distributions: old first buyer's share goes to new first buyer
+        receipt.products.forEach(product => {
+          const currentDist = product.distribution || {};
+          const removedShare = currentDist[firstBuyerId] || 0;
+
+          const newDist = {};
+          // Copy all distributions except removed buyer
+          Object.keys(currentDist).forEach(key => {
+            if (key !== buyerId) {
+              newDist[key] = currentDist[key];
+            }
+          });
+
+          // All of removed first buyer's share goes to new first buyer
+          const currentNewFirstShare = newDist[newFirstBuyerId] || 0;
+          newDist[newFirstBuyerId] = currentNewFirstShare + removedShare;
+
+          updateProductDistribution(receipt.id, product.id, newDist);
+        });
+      }
+    } else {
+      // Remove non-first buyer - their share goes to first buyer
+      updatedBuyers = buyers.filter(b => b.id !== buyerId);
+
+      receipt.products.forEach(product => {
+        const currentDist = product.distribution || {};
+        const removedBuyerShare = currentDist[buyerId] || 0;
+
+        const newDist = { ...currentDist };
+        delete newDist[buyerId];
+
+        if (removedBuyerShare > 0) {
+          newDist[firstBuyerId] = (newDist[firstBuyerId] || 0) + removedBuyerShare;
+        }
+
+        updateProductDistribution(receipt.id, product.id, newDist);
+      });
     }
 
-    const updatedBuyers = buyers.filter(b => b.id !== buyerId);
     updateBuyers(receipt.id, updatedBuyers);
-
-    receipt.products.forEach(product => {
-      const currentDist = product.distribution || {};
-      const firstBuyerId = buyers[0].id;
-      const removedBuyerShare = currentDist[buyerId] || 0;
-
-      const newDist = { ...currentDist };
-      delete newDist[buyerId];
-
-      if (removedBuyerShare > 0) {
-        newDist[firstBuyerId] = (newDist[firstBuyerId] || 0) + removedBuyerShare;
-      }
-
-      updateProductDistribution(receipt.id, product.id, newDist);
-    });
-
     setReceipt(prev => ({ ...prev, buyers: updatedBuyers }));
   };
 
@@ -236,7 +264,7 @@ export function SplitReceipt() {
                     setShowBuyerDropdown(e.target.value.length > 0);
                   }}
                   onFocus={() => setShowBuyerDropdown(true)}
-                  placeholder={buyers.length === 0 ? "Your name (default buyer)" : "Buyer name or select from list"}
+                  placeholder="Buyer name or select from list"
                   className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
                   autoComplete="off"
@@ -269,7 +297,7 @@ export function SplitReceipt() {
 
           {buyers.length === 0 ? (
             <p className="text-gray-500 text-center py-4">
-              Add your name to start splitting the receipt
+              Add a buyer to start splitting the receipt
             </p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -282,17 +310,15 @@ export function SplitReceipt() {
                       <h3 className="font-semibold">
                         {buyer.name}
                         {isDefaultBuyer && (
-                          <span className="ml-2 text-xs text-blue-600 font-normal">(default)</span>
+                          <span className="ml-2 text-xs text-blue-600 font-normal">(buffer)</span>
                         )}
                       </h3>
-                      {!isDefaultBuyer && (
-                        <button
-                          onClick={() => removeBuyer(buyer.id)}
-                          className="text-red-500 hover:text-red-700 text-sm font-bold"
-                        >
-                          ×
-                        </button>
-                      )}
+                      <button
+                        onClick={() => removeBuyer(buyer.id)}
+                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                      >
+                        ×
+                      </button>
                     </div>
                     <p className="text-lg font-bold text-blue-600">
                       {total.toFixed(2)} RSD
