@@ -59,6 +59,25 @@ export const useReceiptStore = create(
       },
 
       /**
+       * Обновляет название магазина
+       */
+      updateStoreName: (receiptId, storeName) => {
+        const receipt = ReceiptRepository.findById(receiptId);
+        if (receipt) {
+          const updated = { ...receipt, storeName };
+          ReceiptRepository.update(updated);
+          set((state) => ({
+            receipts: state.receipts.map(r =>
+              r.id === receiptId ? updated : r
+            ),
+            activeReceipt: state.activeReceipt?.id === receiptId
+              ? updated
+              : state.activeReceipt
+          }));
+        }
+      },
+
+      /**
        * Обновляет распределение продуктов
        */
       updateProductDistribution: (receiptId, productId, distribution) => {
