@@ -15,7 +15,10 @@ export class ReceiptParserService {
     const response = await apiClient.parseReceipt(url);
 
     if (!response.success) {
-      throw new Error(response.error || 'Failed to parse receipt');
+      const errorMessage = response.debug
+        ? `${response.error} (Debug: ${JSON.stringify(response.debug)})`
+        : response.error;
+      throw new Error(errorMessage || 'Failed to parse receipt');
     }
 
     return createReceipt({

@@ -13,6 +13,9 @@ export function SplitReceipt() {
   const [savedBuyers, setSavedBuyers] = useState([]);
   const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
 
+  // Временные значения для input полей (чтобы можно было вводить)
+  const [tempInputValues, setTempInputValues] = useState({});
+
   useEffect(() => {
     const buyers = BuyerRepository.findAll();
     setSavedBuyers(buyers);
@@ -85,48 +88,52 @@ export function SplitReceipt() {
 
     if (buyers.length === 0) return;
 
-    const firstBuyerId = buyers[0].id;
-    const isFirstBuyer = buyerId === firstBuyerId;
-
     const parsedValue = newValue === '' ? 0 : parseFloat(newValue);
     const oldValue = currentDist[buyerId] || 0;
+    const difference = parsedValue - oldValue;
+
+    // Если значение не изменилось, ничего не делаем
+    if (difference === 0) return;
 
     let newDistribution = { ...currentDist };
     newDistribution[buyerId] = parsedValue;
 
-    if (isFirstBuyer) {
-      if (parsedValue < oldValue) {
-        newDistribution[buyerId] = oldValue;
-      } else {
-        const totalOthers = buyers
-          .filter(b => b.id !== firstBuyerId)
-          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
+    if (difference > 0) {
+      // Увеличиваем - забираем у остальных
+      const firstBuyerId = buyers[0].id;
+      let needed = difference;
 
-        const maxAllowed = product.quantity - totalOthers;
-        if (parsedValue > maxAllowed) {
-          newDistribution[buyerId] = maxAllowed;
+      if (buyerId === firstBuyerId) {
+        // Первый покупатель увеличивает - забираем в обратном порядке (с последнего)
+        const otherBuyers = buyers.filter(b => b.id !== buyerId).reverse();
+        for (const otherBuyer of otherBuyers) {
+          if (needed <= 0) break;
+          const otherValue = newDistribution[otherBuyer.id] || 0;
+          const canTake = Math.min(otherValue, needed);
+          newDistribution[otherBuyer.id] = otherValue - canTake;
+          needed -= canTake;
         }
+      } else {
+        // Не первый покупатель увеличивает - забираем у первого, потом у остальных по порядку
+        const otherBuyers = buyers.filter(b => b.id !== buyerId);
+        for (const otherBuyer of otherBuyers) {
+          if (needed <= 0) break;
+          const otherValue = newDistribution[otherBuyer.id] || 0;
+          const canTake = Math.min(otherValue, needed);
+          newDistribution[otherBuyer.id] = otherValue - canTake;
+          needed -= canTake;
+        }
+      }
+
+      // Если не хватило, ограничиваем текущее значение
+      if (needed > 0) {
+        newDistribution[buyerId] = oldValue + (difference - needed);
       }
     } else {
-      const difference = parsedValue - oldValue;
-      const firstBuyerCurrentValue = currentDist[firstBuyerId] || 0;
-
-      if (difference > 0) {
-        const canTake = Math.min(firstBuyerCurrentValue, difference);
-        newDistribution[firstBuyerId] = firstBuyerCurrentValue - canTake;
-
-        if (canTake < difference) {
-          newDistribution[buyerId] = oldValue + canTake;
-        }
-      } else {
-        const excess = Math.abs(difference);
-        const firstBuyerNewValue = firstBuyerCurrentValue + excess;
-        const maxFirst = product.quantity - buyers
-          .filter(b => b.id !== firstBuyerId && b.id !== buyerId)
-          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
-
-        newDistribution[firstBuyerId] = Math.min(firstBuyerNewValue, maxFirst);
-      }
+      // Уменьшаем - отдаём первому покупателю
+      const firstBuyerId = buyers[0].id;
+      const excess = Math.abs(difference);
+      newDistribution[firstBuyerId] = (newDistribution[firstBuyerId] || 0) + excess;
     }
 
     updateProductDistribution(receipt.id, productId, newDistribution);
@@ -140,13 +147,55 @@ export function SplitReceipt() {
   };
 
   const handleInputChange = (productId, buyerId, value) => {
-    if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) >= 0)) {
-      updateDistribution(productId, buyerId, value);
-    }
+    const key = `${productId}-${buyerId}`;
+    setTempInputValues(prev => ({ ...prev, [key]: value }));
   };
 
-  const getInputValue = (productId, buyerId, actualValue) => {
-    return actualValue === 0 ? '' : actualValue;
+  const handleBlur = (productId, buyerId, inputValue) => {
+    const key = `${productId}-${buyerId}`;
+    // Очищаем временное значение
+    setTempInputValues(prev => {
+      const newValues = { ...prev };
+      delete newValues[key];
+      return newValues;
+    });
+
+    const product = receipt.products.find(p => p.id === productId);
+    const currentDist = product.distribution || {};
+    const oldValue = currentDist[buyerId] || 0;
+    const buyers = receipt.buyers || [];
+    const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
+    const isFirstBuyer = buyerId === firstBuyerId;
+
+    const parsedValue = inputValue === '' || inputValue === '0' ? 0 : parseFloat(inputValue);
+
+    if (isFirstBuyer) {
+      // Правила для первого покупателя
+      if (parsedValue === 0) {
+        // Пусто или 0 → восстанавливаем oldValue
+        updateDistribution(productId, buyerId, oldValue);
+        return;
+      }
+
+      if (parsedValue < oldValue) {
+        // Уменьшение → восстанавливаем oldValue
+        updateDistribution(productId, buyerId, oldValue);
+        return;
+      }
+
+      // Увеличение → применяем
+      updateDistribution(productId, buyerId, parsedValue);
+    } else {
+      // Правила для не первых покупателей
+      if (parsedValue === 0) {
+        // Пусто или 0 → всё первому покупателю
+        updateDistribution(productId, buyerId, 0);
+        return;
+      }
+
+      // Увеличение или уменьшение → применяем (излишек уходит первому)
+      updateDistribution(productId, buyerId, parsedValue);
+    }
   };
 
   const removeBuyer = (buyerId) => {
@@ -365,29 +414,25 @@ export function SplitReceipt() {
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
-                          const inputValue = getInputValue(product.id, buyer.id, share);
-                          const isFirstBuyerColumn = buyer.id === firstBuyerId;
+                          const inputKey = `${product.id}-${buyer.id}`;
+                          const inputValue = tempInputValues[inputKey] !== undefined
+                            ? tempInputValues[inputKey]
+                            : share;
 
                           return (
                             <td key={buyer.id} className="px-4 py-3 text-center">
                               <input
-                                type="number"
-                                min="0"
-                                max={isFirstBuyerColumn ? product.quantity : product.quantity}
-                                step="0.01"
+                                type="text"
+                                inputMode="numeric"
                                 value={inputValue}
-                                onChange={(e) => handleInputChange(
+                                onFocus={(e) => e.target.select()}
+                                onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
+                                onBlur={(e) => handleBlur(
                                   product.id,
                                   buyer.id,
                                   e.target.value
                                 )}
-                                onFocus={(e) => e.target.select()}
-                                placeholder="0"
-                                className={`w-20 border p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  isFirstBuyerColumn
-                                    ? 'border-blue-300 bg-blue-50'
-                                    : 'border-gray-300'
-                                }`}
+                                className="w-20 border border-gray-300 p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                               <div className="text-xs text-gray-500 mt-1">
                                 {(share * unitPrice).toFixed(2)} RSD

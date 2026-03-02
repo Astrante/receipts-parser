@@ -46,13 +46,8 @@ export function ReceiptList() {
   });
 
   const formatDateTime = (date) => {
-    return new Date(date).toLocaleString('sr-RS', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const d = new Date(date);
+    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
   return (
@@ -89,42 +84,57 @@ export function ReceiptList() {
               return (
                 <div
                   key={receipt.id}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow group"
+                  onClick={() => navigate(`/receipt/${receipt.id}`)}
+                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer group"
                 >
-                  <div className="p-4 pb-2 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={(e) => handleDelete(receipt.id, e)}
-                      className="text-gray-400 hover:text-red-500 hover:bg-red-50 text-base leading-none p-2 rounded-lg transition-all"
-                      title="Delete receipt"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div
-                    onClick={() => navigate(`/receipt/${receipt.id}`)}
-                    className="cursor-pointer px-4 pb-4"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-lg text-gray-800">{receipt.storeName}</h3>
-                        <p className="text-gray-500 text-sm mt-1">
+                  <div className="p-4">
+                    {/* Header: Store name + Delete button */}
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="font-semibold text-lg text-gray-800 flex-1">{receipt.storeName}</h3>
+                      <button
+                        onClick={(e) => handleDelete(receipt.id, e)}
+                        className="text-gray-400 hover:text-red-500 hover:bg-red-50 text-base leading-none p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
+                        title="Удалить чек"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-gray-200 my-3"></div>
+
+                    {/* Two column layout */}
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Left column: Date and Items count */}
+                      <div className="space-y-2">
+                        <div className="flex items-center text-sm text-gray-600">
+                          <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
                           {formatDateTime(receipt.date)}
-                        </p>
-                        <p className="text-gray-500 text-sm mt-2">
+                        </div>
+                        <div className="flex items-center text-sm text-gray-600">
+                          <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                          </svg>
                           {receipt.products.length} items
-                        </p>
+                        </div>
                       </div>
-                      <div className="text-right ml-4">
-                        <p className="font-bold text-xl text-gray-800">
-                          {receipt.totalAmount.toFixed(2)} RSD
-                        </p>
-                        {buyersBreakdown && (
-                          <div className="mt-2 space-y-1">
+
+                      {/* Right column: Buyer breakdown or Total */}
+                      <div className="text-right">
+                        {buyersBreakdown && buyersBreakdown.length > 0 ? (
+                          <div className="space-y-1">
                             {buyersBreakdown.map((buyer, idx) => (
-                              <div key={idx} className="text-sm text-gray-600">
-                                {buyer.name}: {buyer.share.toFixed(2)} RSD
+                              <div key={idx} className="text-sm">
+                                <span className="text-gray-600">{buyer.name}:</span>{' '}
+                                <span className="font-semibold text-gray-800">{buyer.share.toFixed(2)} RSD</span>
                               </div>
                             ))}
+                          </div>
+                        ) : (
+                          <div className="font-bold text-xl text-gray-800">
+                            {receipt.totalAmount.toFixed(2)} RSD
                           </div>
                         )}
                       </div>
