@@ -27,8 +27,11 @@ export const apiClient = {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || 'Failed to parse receipt');
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      const errorMessage = errorData.debug
+        ? `${errorData.error} (Debug: ${JSON.stringify(errorData.debug)})`
+        : errorData.error;
+      throw new Error(errorMessage || 'Failed to parse receipt');
     }
 
     return response.json();

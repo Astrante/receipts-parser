@@ -14,6 +14,10 @@ export function ReceiptDetail() {
   const [newBuyerName, setNewBuyerName] = useState('');
   const [savedBuyers, setSavedBuyers] = useState([]);
   const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
+  const [isBuyersCollapsed, setIsBuyersCollapsed] = useState(false);
+
+  // Временные значения для input полей (чтобы можно было вводить)
+  const [tempInputValues, setTempInputValues] = useState({});
 
   useEffect(() => {
     const buyers = BuyerRepository.findAll();
@@ -113,48 +117,52 @@ export function ReceiptDetail() {
 
     if (buyers.length === 0) return;
 
-    const firstBuyerId = buyers[0].id;
-    const isFirstBuyer = buyerId === firstBuyerId;
-
     const parsedValue = newValue === '' ? 0 : parseFloat(newValue);
     const oldValue = currentDist[buyerId] || 0;
+    const difference = parsedValue - oldValue;
+
+    // Если значение не изменилось, ничего не делаем
+    if (difference === 0) return;
 
     let newDistribution = { ...currentDist };
     newDistribution[buyerId] = parsedValue;
 
-    if (isFirstBuyer) {
-      if (parsedValue < oldValue) {
-        newDistribution[buyerId] = oldValue;
-      } else {
-        const totalOthers = buyers
-          .filter(b => b.id !== firstBuyerId)
-          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
+    if (difference > 0) {
+      // Увеличиваем - забираем у остальных
+      const firstBuyerId = buyers[0].id;
+      let needed = difference;
 
-        const maxAllowed = product.quantity - totalOthers;
-        if (parsedValue > maxAllowed) {
-          newDistribution[buyerId] = maxAllowed;
+      if (buyerId === firstBuyerId) {
+        // Первый покупатель увеличивает - забираем в обратном порядке (с последнего)
+        const otherBuyers = buyers.filter(b => b.id !== buyerId).reverse();
+        for (const otherBuyer of otherBuyers) {
+          if (needed <= 0) break;
+          const otherValue = newDistribution[otherBuyer.id] || 0;
+          const canTake = Math.min(otherValue, needed);
+          newDistribution[otherBuyer.id] = otherValue - canTake;
+          needed -= canTake;
         }
+      } else {
+        // Не первый покупатель увеличивает - забираем у первого, потом у остальных по порядку
+        const otherBuyers = buyers.filter(b => b.id !== buyerId);
+        for (const otherBuyer of otherBuyers) {
+          if (needed <= 0) break;
+          const otherValue = newDistribution[otherBuyer.id] || 0;
+          const canTake = Math.min(otherValue, needed);
+          newDistribution[otherBuyer.id] = otherValue - canTake;
+          needed -= canTake;
+        }
+      }
+
+      // Если не хватило, ограничиваем текущее значение
+      if (needed > 0) {
+        newDistribution[buyerId] = oldValue + (difference - needed);
       }
     } else {
-      const difference = parsedValue - oldValue;
-      const firstBuyerCurrentValue = currentDist[firstBuyerId] || 0;
-
-      if (difference > 0) {
-        const canTake = Math.min(firstBuyerCurrentValue, difference);
-        newDistribution[firstBuyerId] = firstBuyerCurrentValue - canTake;
-
-        if (canTake < difference) {
-          newDistribution[buyerId] = oldValue + canTake;
-        }
-      } else {
-        const excess = Math.abs(difference);
-        const firstBuyerNewValue = firstBuyerCurrentValue + excess;
-        const maxFirst = product.quantity - buyers
-          .filter(b => b.id !== firstBuyerId && b.id !== buyerId)
-          .reduce((sum, b) => sum + (newDistribution[b.id] || 0), 0);
-
-        newDistribution[firstBuyerId] = Math.min(firstBuyerNewValue, maxFirst);
-      }
+      // Уменьшаем - отдаём первому покупателю
+      const firstBuyerId = buyers[0].id;
+      const excess = Math.abs(difference);
+      newDistribution[firstBuyerId] = (newDistribution[firstBuyerId] || 0) + excess;
     }
 
     updateProductDistribution(receipt.id, productId, newDistribution);
@@ -168,13 +176,55 @@ export function ReceiptDetail() {
   };
 
   const handleInputChange = (productId, buyerId, value) => {
-    if (value === '' || (!isNaN(parseFloat(value)) && parseFloat(value) >= 0)) {
-      updateDistribution(productId, buyerId, value);
-    }
+    const key = `${productId}-${buyerId}`;
+    setTempInputValues(prev => ({ ...prev, [key]: value }));
   };
 
-  const getInputValue = (productId, buyerId, actualValue) => {
-    return actualValue === 0 ? '' : actualValue;
+  const handleBlur = (productId, buyerId, inputValue) => {
+    const key = `${productId}-${buyerId}`;
+    // Очищаем временное значение
+    setTempInputValues(prev => {
+      const newValues = { ...prev };
+      delete newValues[key];
+      return newValues;
+    });
+
+    const product = receipt.products.find(p => p.id === productId);
+    const currentDist = product.distribution || {};
+    const oldValue = currentDist[buyerId] || 0;
+    const buyers = receipt.buyers || [];
+    const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
+    const isFirstBuyer = buyerId === firstBuyerId;
+
+    const parsedValue = inputValue === '' || inputValue === '0' ? 0 : parseFloat(inputValue);
+
+    if (isFirstBuyer) {
+      // Правила для первого покупателя
+      if (parsedValue === 0) {
+        // Пусто или 0 → восстанавливаем oldValue
+        updateDistribution(productId, buyerId, oldValue);
+        return;
+      }
+
+      if (parsedValue < oldValue) {
+        // Уменьшение → восстанавливаем oldValue
+        updateDistribution(productId, buyerId, oldValue);
+        return;
+      }
+
+      // Увеличение → применяем
+      updateDistribution(productId, buyerId, parsedValue);
+    } else {
+      // Правила для не первых покупателей
+      if (parsedValue === 0) {
+        // Пусто или 0 → всё первому покупателю
+        updateDistribution(productId, buyerId, 0);
+        return;
+      }
+
+      // Увеличение или уменьшение → применяем (излишек уходит первому)
+      updateDistribution(productId, buyerId, parsedValue);
+    }
   };
 
   const removeBuyer = (buyerId) => {
@@ -263,18 +313,13 @@ export function ReceiptDetail() {
   const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
 
   const formatDateTime = (date) => {
-    return new Date(date).toLocaleString('sr-RS', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const d = new Date(date);
+    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-4">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-4 flex justify-between items-start">
           <div className="flex items-center gap-4">
@@ -311,119 +356,108 @@ export function ReceiptDetail() {
           </button>
         </div>
 
-        {/* Receipt Header */}
-        <div className="bg-white rounded-lg shadow p-6 mb-4">
-          {isEditingStore ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={editedStoreName}
-                onChange={(e) => setEditedStoreName(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSaveStoreName()}
-                className="flex-1 text-2xl font-bold border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                autoFocus
-              />
-              <button
-                onClick={handleSaveStoreName}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-              >
-                Save
-              </button>
-              <button
-                onClick={handleCancelStoreName}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
-              <button
-                onClick={handleEditStoreName}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
-                title="Edit store name"
-              >
-                ✏️
-              </button>
-            </div>
-          )}
-          <p className="text-gray-500">
-            {formatDateTime(receipt.date)}
-          </p>
-        </div>
-
-        {/* Add Buyers - always show when has buyers */}
-        {hasBuyers && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Buyers</h2>
-            <div className="relative">
-              <div className="flex gap-2 mb-4">
-                <div className="flex-1 relative">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Left Column - Receipt Content */}
+          <div className="lg:col-span-3 space-y-4">
+            {/* Receipt Header */}
+            <div className="bg-white rounded-lg shadow p-6">
+              {isEditingStore ? (
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
-                    value={newBuyerName}
-                    onChange={(e) => {
-                      setNewBuyerName(e.target.value);
-                      setShowBuyerDropdown(e.target.value.length > 0);
-                    }}
-                    onFocus={() => setShowBuyerDropdown(true)}
-                    placeholder="Buyer name or select from list"
-                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
-                    autoComplete="off"
+                    value={editedStoreName}
+                    onChange={(e) => setEditedStoreName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSaveStoreName()}
+                    className="flex-1 text-2xl font-bold border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
                   />
-                  {showBuyerDropdown && savedBuyers.length > 0 && (
-                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                      {savedBuyers
-                        .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
-                        .map(buyer => (
-                          <div
-                            key={buyer.id}
-                            onClick={() => selectBuyer(buyer)}
-                            className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
-                          >
-                            <div className="font-medium">{buyer.name}</div>
-                          </div>
-                        ))}
-                    </div>
-                  )}
+                  <button
+                    onClick={handleSaveStoreName}
+                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={handleCancelStoreName}
+                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                <button
-                  onClick={addBuyer}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-1"
-                >
-                  <span className="text-lg leading-none">+</span>
-                  <span>Add Buyer</span>
-                </button>
-              </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
+                  <button
+                    onClick={handleEditStoreName}
+                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                    title="Edit store name"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              )}
+              <p className="text-gray-500">
+                {formatDateTime(receipt.date)}
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {buyers.map((buyer) => {
-                const total = calculateBuyerShare(buyer.id, receipt);
-                return (
-                  <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold">
-                        {buyer.name}
-                      </h3>
+            {/* Buyers - compact version for mobile */}
+            {hasBuyers && (
+              <div className="lg:hidden bg-white rounded-lg shadow p-4">
+                <button
+                  onClick={() => setIsBuyersCollapsed(!isBuyersCollapsed)}
+                  className="w-full flex items-center justify-between text-lg font-semibold mb-3"
+                >
+                  <span>Buyers ({buyers.length})</span>
+                  <span className="text-gray-500">{isBuyersCollapsed ? '▼' : '▲'}</span>
+                </button>
+                {!isBuyersCollapsed && (
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={newBuyerName}
+                        onChange={(e) => {
+                          setNewBuyerName(e.target.value);
+                          setShowBuyerDropdown(e.target.value.length > 0);
+                        }}
+                        onFocus={() => setShowBuyerDropdown(true)}
+                        placeholder="Add buyer..."
+                        className="flex-1 border border-gray-300 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                        autoComplete="off"
+                      />
                       <button
-                        onClick={() => removeBuyer(buyer.id)}
-                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                        onClick={addBuyer}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
                       >
-                        ×
+                        +
                       </button>
                     </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      {total.toFixed(2)} RSD
-                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {buyers.map((buyer) => {
+                        const total = calculateBuyerShare(buyer.id, receipt);
+                        return (
+                          <div key={buyer.id} className="bg-gray-50 p-3 rounded-lg border relative">
+                            <button
+                              onClick={() => removeBuyer(buyer.id)}
+                              className="absolute top-1 right-1 text-red-500 hover:text-red-700 text-xs"
+                            >
+                              ×
+                            </button>
+                            <h3 className="font-semibold text-sm pr-4">{buyer.name}</h3>
+                            <p className="text-base font-bold text-blue-600">
+                              {total.toFixed(2)} RSD
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                )}
+              </div>
+            )}
 
         {/* Product Distribution Table */}
         {hasBuyers ? (
@@ -464,29 +498,21 @@ export function ReceiptDetail() {
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
-                          const inputValue = getInputValue(product.id, buyer.id, share);
-                          const isFirstBuyerColumn = buyer.id === firstBuyerId;
+                          const inputKey = `${product.id}-${buyer.id}`;
+                          const inputValue = tempInputValues[inputKey] !== undefined
+                            ? tempInputValues[inputKey]
+                            : share;
 
                           return (
                             <td key={buyer.id} className="px-4 py-3 text-center">
                               <input
-                                type="number"
-                                min="0"
-                                max={isFirstBuyerColumn ? product.quantity : product.quantity}
-                                step="0.01"
+                                type="text"
+                                inputMode="numeric"
                                 value={inputValue}
-                                onChange={(e) => handleInputChange(
-                                  product.id,
-                                  buyer.id,
-                                  e.target.value
-                                )}
                                 onFocus={(e) => e.target.select()}
-                                placeholder="0"
-                                className={`w-20 border p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                                  isFirstBuyerColumn
-                                    ? 'border-blue-300 bg-blue-50'
-                                    : 'border-gray-300'
-                                }`}
+                                onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
+                                onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
+                                className="w-20 border border-gray-300 p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
                               />
                               <div className="text-xs text-gray-500 mt-1">
                                 {(share * unitPrice).toFixed(2)} RSD
@@ -533,11 +559,6 @@ export function ReceiptDetail() {
                     <p className="text-sm text-gray-500">
                       {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)} RSD
                     </p>
-                    {product.taxRate > 0 && (
-                      <span className="text-xs text-gray-400">
-                        VAT: {product.taxRate}%
-                      </span>
-                    )}
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-lg">{product.total.toFixed(2)} RSD</p>
@@ -548,30 +569,104 @@ export function ReceiptDetail() {
           </div>
         )}
 
-        {/* Summary */}
-        <div className="bg-white rounded-lg shadow p-6 mb-4">
-          <div className="flex justify-between items-center text-lg mb-2">
-            <span className="text-gray-600">Subtotal:</span>
-            <span className="font-semibold">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)} RSD</span>
-          </div>
-          <div className="flex justify-between items-center text-lg mb-2">
-            <span className="text-gray-600">VAT:</span>
-            <span className="font-semibold">{receipt.taxAmount.toFixed(2)} RSD</span>
-          </div>
-          <div className="flex justify-between items-center text-xl border-t pt-2 mt-2">
-            <span className="font-bold">Total:</span>
-            <span className="font-bold text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
-          </div>
-        </div>
+            {/* Summary */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex justify-between items-center text-lg mb-2">
+                <span className="text-gray-600">Subtotal:</span>
+                <span className="font-semibold">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)} RSD</span>
+              </div>
+              <div className="flex justify-between items-center text-lg mb-2">
+                <span className="text-gray-600">VAT:</span>
+                <span className="font-semibold">{receipt.taxAmount.toFixed(2)} RSD</span>
+              </div>
+              <div className="flex justify-between items-center text-xl border-t pt-2 mt-2">
+                <span className="font-bold">Total:</span>
+                <span className="font-bold text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
+              </div>
+            </div>
 
-        {/* Actions */}
-        <div className="flex gap-4">
-          <button
-            onClick={() => window.open(receipt.originalUrl, '_blank')}
-            className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
-          >
-            View Original Receipt
-          </button>
+            {/* Actions */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => window.open(receipt.originalUrl, '_blank')}
+                className="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+              >
+                View Original Receipt
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column - Buyers Sidebar (Desktop only) */}
+          {hasBuyers && (
+            <div className="hidden lg:block lg:col-span-1">
+              <div className="bg-white rounded-lg shadow p-4 sticky top-4">
+                <h3 className="text-lg font-semibold mb-3">Buyers</h3>
+
+                {/* Add Buyer Form */}
+                <div className="mb-4">
+                  <div className="flex gap-2 mb-3">
+                    <input
+                      type="text"
+                      value={newBuyerName}
+                      onChange={(e) => {
+                        setNewBuyerName(e.target.value);
+                        setShowBuyerDropdown(e.target.value.length > 0);
+                      }}
+                      onFocus={() => setShowBuyerDropdown(true)}
+                      placeholder="Add buyer..."
+                      className="flex-1 border border-gray-300 p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                      autoComplete="off"
+                    />
+                    <button
+                      onClick={addBuyer}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm"
+                    >
+                      +
+                    </button>
+                  </div>
+                  {showBuyerDropdown && savedBuyers.length > 0 && (
+                    <div className="relative">
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                        {savedBuyers
+                          .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
+                          .map(buyer => (
+                            <div
+                              key={buyer.id}
+                              onClick={() => selectBuyer(buyer)}
+                              className="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0 text-sm"
+                            >
+                              <div className="font-medium">{buyer.name}</div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Buyers List */}
+                <div className="space-y-2">
+                  {buyers.map((buyer) => {
+                    const total = calculateBuyerShare(buyer.id, receipt);
+                    return (
+                      <div key={buyer.id} className="bg-gray-50 p-3 rounded-lg border relative group">
+                        <button
+                          onClick={() => removeBuyer(buyer.id)}
+                          className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm opacity-0 group-hover:opacity-100"
+                        >
+                          ×
+                        </button>
+                        <h3 className="font-semibold text-sm pr-4">{buyer.name}</h3>
+                        <p className="text-lg font-bold text-blue-600">
+                          {total.toFixed(2)} RSD
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
