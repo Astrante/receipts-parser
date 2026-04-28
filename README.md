@@ -2,6 +2,16 @@
 
 Веб-приложение для сканирования QR-кодов с чеков и разделения покупок между людьми.
 
+## 🌐 Онлайн версия
+
+Сервис доступен по адресу: **https://reciept-parser.vercel.app/**
+
+### Использование онлайн версии
+1. Откройте [https://reciept-parser.vercel.app/](https://reciept-parser.vercel.app/)
+2. Нажмите "Scan" для сканирования QR-кода с чека
+3. Или введите URL чека вручную
+4. Чек автоматически распарсится и сохранится в вашем браузере
+
 ## Особенности
 
 - 📷 Сканирование QR-кодов через камеру устройства
@@ -163,148 +173,88 @@ npm run build
 
 ---
 
-## 🚀 Развертывание на GitHub Pages + Render.com
+## 🚀 Развертывание на Vercel (рекомендуется)
 
 ### Архитектура продакшена
 
 ```
-GitHub Pages (Frontend) → Render.com (Backend Proxy) → suf.purs.gov.rs
-     https://username.github.io     https://your-backend.onrender.com
+Vercel (Frontend + Serverless API) → suf.purs.gov.rs
+     https://reciept-parser.vercel.app
 ```
 
-### Шаг 1: Деплой Backend на Render.com
+### Преимущества Vercel
 
-1. **Создайте аккаунт на [Render.com](https://render.com)**
+- ✅ **Frontend + Backend вместе** в одном проекте
+- ✅ **Автоматический деплой** из Git
+- ✅ **Serverless Functions** для API
+- ✅ **Быстрая CDN** по всему миру
+- ✅ **Бесплатный тариф** с хорошими лимитами
 
-2. **Создайте новый Web Service**
-   - Нажмите "New +" → "Web Service"
-   - Подключите ваш GitHub репозиторий
-   - Render автоматически найдёт `backend/render.yaml`
+### Шаг 1: Подключение к Vercel
 
-3. **Настройте переменные окружения** (в Render Dashboard):
+1. **Откройте [vercel.com/new](https://vercel.com/new)**
+
+2. **Импортируйте репозиторий**
+   - Выберите `Astrante/receipts-parser` (или ваш репозиторий)
+   - Нажмите "Import"
+
+3. **Настройте проект**
    ```
-   FRONTEND_URL=https://[ваш-username].github.io/recieptParser/
-   ```
-   - Замените `ваш-username` на ваш GitHub username
-   - Если репозиторий называется иначе, замените `recieptParser`
-
-4. **Дождитесь деплоя**
-   - Render предоставит URL вида: `https://receipt-parser-backend.onrender.com`
-   - Сохраните этот URL для следующего шага
-
-5. **Проверьте работу backend**
-   ```bash
-   curl https://your-backend.onrender.com/api/receipts/parse \
-     -X POST \
-     -H "Content-Type: application/json" \
-     -d '{"url":"https://suf.purs.gov.rs/v/?vl=test"}'
+   Framework Preset: Vite
+   Root Directory: frontend
+   Build Command: npm run build
+   Output Directory: dist
    ```
 
-### Шаг 2: Деплой Frontend на GitHub Pages
+4. **Нажмите "Deploy"**
 
-1. **Настройте переменную окружения для production backend**
+### Шаг 2: Готово!
 
-   В файле `frontend/.env.production`:
-   ```env
-   VITE_BACKEND_URL=https://your-backend.onrender.com
-   ```
-   Замените на ваш URL из Render.com
+Vercel автоматически:
+- Соберёт frontend
+- Создаст serverless функцию для `/api/receipts/parse`
+- Разместит всё на CDN
+- Предоставит URL: `https://reciept-parser.vercel.app`
 
-2. **Настройте base path в Vite**
+### Структура Vercel проекта
 
-   Отредактируйте `frontend/vite.config.js`, заменив `recieptParser` на имя вашего репозитория:
-   ```js
-   export default defineConfig({
-     plugins: [react()],
-     base: '/ваш-репозиторий/', // Имя репозитория на GitHub
-     // ...
-   })
-   ```
-
-3. **Соберите фронтенд**
-   ```bash
-   cd frontend
-   npm run build:gh-pages
-   ```
-
-4. **Задеплойте на GitHub Pages**
-
-   **Вариант A: Автоматический деплой (рекомендуется)**
-   ```bash
-   npm run deploy
-   ```
-
-   **Вариант B: Вручную через GitHub UI**
-   - Откройте ваш репозиторий на GitHub
-   - Settings → Pages
-   - Source: Deploy from a branch
-   - Branch: `gh-pages` → `/ (root)`
-   - Нажмите Save
-
-5. **Доступ к приложению**
-   ```
-   https://[ваш-username].github.io/[ваш-репозиторий]/
-   ```
-
-### Шаг 3: Настройка CORS на Render.com
-
-1. Откройте ваш Render Dashboard
-2. В настройках Web Service добавьте переменную окружения:
-   ```
-   FRONTEND_URL=https://[ваш-username].github.io/[ваш-репозиторий]/
-   ```
-3. Render автоматически перезапустит сервер
-
-### Тестирование продакшена
-
-1. Откройте ваше приложение на GitHub Pages
-2. Попробуйте отсканировать QR код или ввести URL
-3. Проверьте консоль браузера на наличие ошибок
-4. Проверьте Network Tab чтобы убедиться, что запросы идут к Render.com backend
+```
+frontend/
+├── api/                    # Vercel Serverless Functions
+│   └── receipts/
+│       └── parse.js       # POST /api/receipts/parse
+├── dist/                  # Собранный frontend
+└── ...                    # Остальные файлы
+```
 
 ### Обновление приложения
 
-**Для обновления frontend:**
+Просто запушьте изменения в GitHub:
 ```bash
-cd frontend
-npm run deploy
+git add .
+git commit -m "Update app"
+git push origin main
 ```
 
-**Для обновления backend:**
-- Просто запушьте изменения в GitHub
-- Render автоматически задеплоит новую версию
+Vercel автоматически задеплоит новую версию! ⚡
 
-### Альтернативные варианты Backend
+---
 
-Если Render.com не подходит, можно использовать:
+## 🚀 Альтернативные варианты деплоя
 
-#### Вариант 1: Railway
-```yaml
-# backend/railway.json
-{
-  "build": {
-    "builder": "NIXPACKS"
-  },
-  "deploy": {
-    "startCommand": "node src/server.js",
-    "healthcheckPath": "/api/receipts/parse"
-  }
-}
-```
+### Вариант 2: GitHub Pages + Render.com
 
-#### Вариант 2: Vercel (serverless functions)
-```javascript
-// api/receipts/parse.js
-export default async function handler(req, res) {
-  // Код из receiptProxy.js
-}
-```
+**Frontend**: GitHub Pages
+**Backend**: Render.com (Express.js proxy)
 
-#### Вариант 3: Fly.io
-```bash
-fly launch
-fly deploy
-```
+Подходит если хотите разделить frontend и backend на разные платформы.
+
+### Вариант 3: Railway + GitHub Pages
+
+**Frontend**: GitHub Pages
+**Backend**: Railway (Node.js service)
+
+Альтернатива Render.com с похожими возможностями.
 
 ## Лицензия
 
