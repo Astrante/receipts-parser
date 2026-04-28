@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
@@ -8,10 +8,22 @@ export function ReceiptList() {
   const { receipts, loadReceipts, deleteReceipt, addReceipt } = useReceiptStore();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  const [showNewMenu, setShowNewMenu] = useState(false);
 
   useEffect(() => {
     loadReceipts();
   }, [loadReceipts]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNewMenu && !event.target.closest('.relative')) {
+        setShowNewMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNewMenu]);
 
   const getBuyersBreakdown = (receipt) => {
     if (!receipt.buyers || receipt.buyers.length === 0) {
@@ -87,7 +99,7 @@ export function ReceiptList() {
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Receipts</h1>
-          <div className="flex gap-2">
+          <div className="relative">
             <input
               ref={fileInputRef}
               type="file"
@@ -96,21 +108,46 @@ export function ReceiptList() {
               className="hidden"
             />
             <button
-              onClick={handleImportClick}
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
-              title="Import receipt from JSON file"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              Import
-            </button>
-            <button
-              onClick={() => navigate('/scan')}
+              onClick={() => setShowNewMenu(!showNewMenu)}
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
-              + Scan New
+              + New
             </button>
+
+            {showNewMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+                <button
+                  onClick={() => {
+                    setShowNewMenu(false);
+                    navigate('/scan');
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                >
+                  <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                  <div>
+                    <div className="font-semibold">Scan Receipt</div>
+                    <div className="text-xs text-gray-500">Scan QR code</div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    setShowNewMenu(false);
+                    handleImportClick();
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 transition-colors border-t"
+                >
+                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  <div>
+                    <div className="font-semibold">Import JSON</div>
+                    <div className="text-xs text-gray-500">From file</div>
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -124,7 +161,7 @@ export function ReceiptList() {
               onClick={() => navigate('/scan')}
               className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
             >
-              Scan Your First Receipt
+              Add Your First Receipt
             </button>
           </div>
         ) : (
