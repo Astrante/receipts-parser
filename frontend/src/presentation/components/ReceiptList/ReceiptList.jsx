@@ -1,18 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
-import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { importReceiptFromJSON } from '../../../core/utils/receiptShare.js';
 
 export function ReceiptList() {
-  const { receipts, loadReceipts, deleteReceipt } = useReceiptStore();
+  const { receipts, loadReceipts, deleteReceipt, addReceipt } = useReceiptStore();
   const navigate = useNavigate();
-  const [defaultUserName, setDefaultUserName] = useState('');
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     loadReceipts();
-    const defaultName = localStorage.getItem('defaultUserName') || '';
-    setDefaultUserName(defaultName);
   }, [loadReceipts]);
 
   const getBuyersBreakdown = (receipt) => {
@@ -30,6 +28,40 @@ export function ReceiptList() {
     e.stopPropagation();
     if (confirm('Are you sure you want to delete this receipt?')) {
       deleteReceipt(id);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const importedReceipt = await importReceiptFromJSON(file);
+
+      // Генерируем новый ID для импортированного чека
+      const newReceipt = {
+        ...importedReceipt,
+        id: crypto.randomUUID(),
+        importedAt: new Date().toISOString()
+      };
+
+      addReceipt(newReceipt);
+      alert('Receipt imported successfully!');
+
+      // Перейти к импортированному чеку
+      navigate(`/receipt/${newReceipt.id}`);
+    } catch (error) {
+      console.error('Failed to import receipt:', error);
+      alert('Failed to import receipt. Please check the file format.');
+    }
+
+    // Очистить input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -55,12 +87,31 @@ export function ReceiptList() {
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">My Receipts</h1>
-          <button
-            onClick={() => navigate('/scan')}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            + Scan New
-          </button>
+          <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              onClick={handleImportClick}
+              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+              title="Import receipt from JSON file"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              Import
+            </button>
+            <button
+              onClick={() => navigate('/scan')}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+            >
+              + Scan New
+            </button>
+          </div>
         </div>
 
         {sortedReceipts.length === 0 ? (

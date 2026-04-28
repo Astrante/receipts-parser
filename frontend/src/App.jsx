@@ -3,6 +3,7 @@ import { QRScanner } from './presentation/components/QRScanner/QRScanner.jsx';
 import { ReceiptList } from './presentation/components/ReceiptList/ReceiptList.jsx';
 import { ReceiptDetail } from './presentation/components/ReceiptDetail/ReceiptDetail.jsx';
 import { SplitReceipt } from './presentation/components/SplitReceipt/SplitReceipt.jsx';
+import { SharedReceipt } from './presentation/components/SharedReceipt/SharedReceipt.jsx';
 import { useReceiptStore } from './store/receiptStore.js';
 import { useEffect } from 'react';
 
@@ -38,6 +39,7 @@ function App() {
             <Route path="/scan" element={<QRScanner />} />
             <Route path="/receipt/:id" element={<ReceiptDetail />} />
             <Route path="/receipt/:id/split" element={<SplitReceipt />} />
+            <Route path="/shared/:data" element={<SharedReceipt />} />
           </Routes>
         </main>
       </div>
