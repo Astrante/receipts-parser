@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { decodeReceipt } from '../../../core/utils/receiptShare.js';
-import { ShareButtons } from '../ShareButtons/ShareButtons.jsx';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 
 export function SharedReceipt() {
@@ -247,12 +246,6 @@ export function SharedReceipt() {
             <span className="font-bold">Total:</span>
             <span className="font-bold text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
           </div>
-        </div>
-
-        {/* Share Buttons */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="font-semibold text-lg mb-3">Share this receipt</h3>
-          <ShareButtons receipt={receipt} />
         </div>
       </div>
     </div>
