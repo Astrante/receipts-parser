@@ -65,13 +65,9 @@ export function ReceiptList() {
   };
 
   const dropdownTrigger = (
-    <button className="bg-beige hover:bg-beige/90 text-forest font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 shadow-lg">
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <button className="bg-terracotta hover:bg-terracotta/90 text-white font-semibold py-2 px-3 rounded-lg transition-colors flex items-center justify-center shadow-lg w-10 h-10">
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-      </svg>
-      New
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     </button>
   );
