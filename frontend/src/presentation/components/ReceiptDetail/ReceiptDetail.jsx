@@ -373,7 +373,7 @@ export function ReceiptDetail() {
                     value={editedStoreName}
                     onChange={(e) => setEditedStoreName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveStoreName()}
-                    className="flex-1 font-semibold border border-forest/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
+                    className="flex-1 font-semibold border border-forest/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-charcoal text-beige"
                     style={{ fontSize: '15px' }}
                     autoFocus
                   />
@@ -445,7 +445,7 @@ export function ReceiptDetail() {
                         }}
                         onFocus={() => setShowBuyerDropdown(true)}
                         placeholder="Add buyer..."
-                        className="flex-1 border border-forest/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                        className="flex-1 border border-forest/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-charcoal text-beige placeholder-beige/50"
                         style={{ fontSize: '12px' }}
                         onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                         autoComplete="off"
@@ -536,7 +536,7 @@ export function ReceiptDetail() {
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
                                 onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                                className="w-16 border border-forest/30 p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
+                                className="w-16 border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
                                 style={{ fontSize: '12px' }}
                               />
                               <div style={{ fontSize: '11px', color: '#4A4A4A', marginTop: '2px' }}>
@@ -638,7 +638,7 @@ export function ReceiptDetail() {
                       }}
                       onFocus={() => setShowBuyerDropdown(true)}
                       placeholder="Add buyer..."
-                      className="flex-1 border border-forest/30 p-2 rounded focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                      className="flex-1 border border-forest/30 p-2 rounded focus:outline-none focus:ring-2 focus:ring-terracotta bg-charcoal text-beige placeholder-beige/50"
                       style={{ fontSize: '12px' }}
                       onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                       autoComplete="off"

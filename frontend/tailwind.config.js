@@ -11,6 +11,8 @@ export default {
         beige: '#F5E6CC',
         terracotta: '#E27D60',
         slate: '#4A4A4A',
+        charcoal: '#2C2C2C',
+        darkSlate: '#3A3A3A',
       },
       keyframes: {
         'slide-in-up': {

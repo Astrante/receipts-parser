@@ -113,7 +113,7 @@ export function ScanBottomSheet({ isOpen, onClose }) {
             value={storeName}
             onChange={(e) => setStoreName(e.target.value)}
             placeholder="Maxi, Idea, Shop..."
-            className="w-full border border-forest/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+            className="w-full border border-forest/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-terracotta bg-charcoal text-beige placeholder-beige/50"
             disabled={isParsing}
           />
         </div>
