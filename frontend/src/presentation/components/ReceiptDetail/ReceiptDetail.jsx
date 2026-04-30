@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { calculateBuyerShare, createBuyer } from '../../../core/domain/Buyer.js';
 import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
-import { ShareButtons } from '../ShareButtons/ShareButtons.jsx';
 
 export function ReceiptDetail() {
   const { id } = useParams();
@@ -587,9 +586,7 @@ export function ReceiptDetail() {
             </div>
 
             {/* Actions */}
-            <div className="space-y-4">
-              <ShareButtons receipt={receipt} />
-
+            <div>
               <button
                 onClick={() => window.open(receipt.originalUrl, '_blank')}
                 className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"

@@ -3,6 +3,7 @@ import { QRScannerService } from '../../../core/services/QRScanner.js';
 import { ReceiptParserService } from '../../../core/services/ReceiptParser.js';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
+import { importReceiptFromJSON } from '../../../core/utils/receiptShare.js';
 
 export function QRScanner() {
   const [isScanning, setIsScanning] = useState(false);
@@ -10,6 +11,7 @@ export function QRScanner() {
   const [error, setError] = useState(null);
   const [manualUrl, setManualUrl] = useState('');
   const [storeName, setStoreName] = useState('');
+  const fileInputRef = useRef(null);
   const serviceRef = useRef(null);
   const navigate = useNavigate();
 
@@ -88,6 +90,40 @@ export function QRScanner() {
       setError(getUserFriendlyError(err.message));
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    clearError();
+    setError(null);
+    setIsParsing(true);
+
+    try {
+      const importedReceipt = await importReceiptFromJSON(file);
+
+      const newReceipt = {
+        ...importedReceipt,
+        id: crypto.randomUUID(),
+        importedAt: new Date().toISOString()
+      };
+
+      addReceipt(newReceipt);
+      navigate(`/receipt/${newReceipt.id}`);
+    } catch (err) {
+      console.error('Import error:', err);
+      setError('Failed to import receipt. Please check the file format.');
+    } finally {
+      setIsParsing(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -176,6 +212,25 @@ export function QRScanner() {
             <div className="flex-1 border-t border-gray-300"></div>
           </div>
 
+          {/* Import JSON */}
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-3">Импортировать из JSON:</h2>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <button
+              onClick={handleImportClick}
+              disabled={isParsing || isLoading}
+              className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-gray-400 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+            >
+              Выбрать файл
+            </button>
+          </div>
+
           {/* Manual Input */}
           <div>
             <h2 className="text-lg font-semibold mb-3">Введите ссылку вручную:</h2>
@@ -228,7 +283,8 @@ export function QRScanner() {
             <p className="text-gray-600 text-sm">
               <strong>Как использовать:</strong><br />
               1. Нажмите "Включить камеру" и наведите на QR код чека<br />
-              2. Или вставьте ссылку с чека в поле выше
+              2. Или выберите JSON файл для импорта<br />
+              3. Или вставьте ссылку с чека в поле выше
             </p>
           </div>
         </div>
