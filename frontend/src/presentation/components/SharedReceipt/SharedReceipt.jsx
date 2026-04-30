@@ -63,14 +63,14 @@ export function SharedReceipt() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-beige p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
-            <p className="text-gray-600 mb-6">{error}</p>
+          <div className="bg-forest rounded-lg p-6 text-center">
+            <h1 className="text-xl font-bold text-terracotta mb-3">Error</h1>
+            <p className="text-beige/80 mb-4">{error}</p>
             <button
               onClick={() => navigate('/')}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
             >
               Go to App
             </button>
@@ -82,12 +82,12 @@ export function SharedReceipt() {
 
   if (!receipt) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-beige p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow p-8 text-center">
+          <div className="bg-forest rounded-lg p-6 text-center">
             <div className="animate-pulse flex flex-col items-center">
-              <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-gray-600">Loading receipt...</p>
+              <div className="w-12 h-12 border-4 border-terracotta border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p className="text-beige/80 text-sm">Loading receipt...</p>
             </div>
           </div>
         </div>
@@ -99,19 +99,18 @@ export function SharedReceipt() {
   const hasBuyers = buyers.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-beige p-3">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-            <div className="flex items-start gap-3">
-              <svg className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="mb-4">
+          <div className="bg-forest/90 border border-forest rounded-lg p-3 mb-3">
+            <div className="flex items-start gap-2">
+              <svg className="w-5 h-5 text-terracotta flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="flex-1">
-                <h3 className="font-semibold text-blue-900 mb-1">Shared Receipt</h3>
-                <p className="text-sm text-blue-700">
-                  This is a shared receipt. To save it permanently, click "Import to My Receipts" below.
+                <h3 className="font-semibold text-beige mb-1 text-sm">Shared Receipt</h3>
+                <p className="text-xs text-beige/80">
+                  Import to save permanently
                 </p>
               </div>
             </div>
@@ -120,49 +119,51 @@ export function SharedReceipt() {
           <div className="flex justify-between items-center">
             <button
               onClick={() => navigate('/')}
-              className="text-blue-500 hover:text-blue-700"
+              className="text-slate hover:text-forest flex items-center gap-1 text-sm font-medium"
             >
-              ← Back to Receipts
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
             </button>
             <button
               onClick={handleImportToLocal}
               disabled={isImporting}
-              className="bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-semibold py-2 px-6 rounded-lg transition-colors flex items-center gap-2"
+              className="bg-terracotta hover:bg-terracotta/90 disabled:bg-slate/30 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-2 text-xs"
             >
               {isImporting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   Importing...
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                   </svg>
-                  Import to My Receipts
+                  Import
                 </>
               )}
             </button>
           </div>
         </div>
 
-        {/* Receipt Content */}
-        <div className="bg-white rounded-lg shadow p-6 mb-4">
-          <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
-          <p className="text-gray-500">{formatDateTime(receipt.date)}</p>
+        <div className="bg-forest rounded-lg p-4 mb-3">
+          <h1 className="text-xl font-bold mb-1 text-beige">{receipt.storeName}</h1>
+          <p className="text-beige/70 text-sm">{formatDateTime(receipt.date)}</p>
         </div>
 
         {hasBuyers && (
-          <div className="bg-white rounded-lg shadow p-6 mb-4">
-            <h2 className="text-lg font-semibold mb-3">Buyers</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="bg-forest rounded-lg p-4 mb-3">
+            <h2 className="text-base font-semibold mb-2 text-beige">Buyers</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {buyers.map((buyer) => {
                 const total = calculateBuyerShare(buyer.id, receipt);
                 return (
-                  <div key={buyer.id} className="bg-gray-50 p-3 rounded-lg">
-                    <h3 className="font-semibold text-sm">{buyer.name}</h3>
-                    <p className="text-lg font-bold text-blue-600">
-                      {total.toFixed(2)} RSD
+                  <div key={buyer.id} className="bg-beige/10 p-2 rounded-lg border border-beige/20">
+                    <h3 className="font-semibold text-xs text-beige">{buyer.name}</h3>
+                    <p className="text-base font-bold text-terracotta">
+                      {total.toFixed(2)}
                     </p>
                   </div>
                 );
@@ -171,47 +172,47 @@ export function SharedReceipt() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
-          <div className="p-4 bg-gray-50 border-b">
-            <h2 className="font-semibold text-lg">Products ({receipt.products.length})</h2>
+        <div className="bg-forest rounded-lg overflow-hidden mb-3">
+          <div className="p-3 bg-beige/10 border-b border-beige/20">
+            <h2 className="font-semibold text-beige text-sm">Products ({receipt.products.length})</h2>
           </div>
           <div className="overflow-x-auto">
             {hasBuyers ? (
-              <table className="w-full">
-                <thead className="bg-gray-50">
+              <table className="w-full text-sm">
+                <thead className="bg-beige/10">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold">Product</th>
-                    <th className="px-4 py-3 text-right font-semibold">Qty</th>
-                    <th className="px-4 py-3 text-right font-semibold">Total</th>
+                    <th className="px-3 py-2 text-left font-semibold text-beige text-xs">Product</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Qty</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-4 py-3 text-center font-semibold">
+                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-beige text-xs">
                         {buyer.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-beige/10">
                   {receipt.products.map((product) => {
                     const currentDist = product.distribution || {};
                     return (
                       <tr key={product.id}>
-                        <td className="px-4 py-3 font-medium">{product.name}</td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 font-medium text-beige text-xs">{product.name}</td>
+                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold">
+                        <td className="px-3 py-2 text-right font-semibold text-beige text-xs">
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
                           return (
-                            <td key={buyer.id} className="px-4 py-3 text-center">
+                            <td key={buyer.id} className="px-3 py-2 text-center">
                               {share > 0 ? (
-                                <div className="bg-blue-50 text-blue-700 py-1 px-2 rounded">
+                                <div className="bg-terracotta/20 text-terracotta py-1 px-2 rounded text-xs">
                                   {share}
                                 </div>
                               ) : (
-                                <span className="text-gray-400">-</span>
+                                <span className="text-beige/40 text-xs">-</span>
                               )}
                             </td>
                           );
@@ -222,17 +223,17 @@ export function SharedReceipt() {
                 </tbody>
               </table>
             ) : (
-              <div className="divide-y">
+              <div className="divide-y divide-beige/10">
                 {receipt.products.map((product) => (
-                  <div key={product.id} className="p-4 flex justify-between items-center">
+                  <div key={product.id} className="p-3 flex justify-between items-center">
                     <div className="flex-1">
-                      <h3 className="font-medium text-gray-800">{product.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)} RSD
+                      <h3 className="font-medium text-beige text-sm">{product.name}</h3>
+                      <p className="text-xs text-beige/70">
+                        {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-lg">{product.total.toFixed(2)} RSD</p>
+                      <p className="font-bold text-beige">{product.total.toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -241,10 +242,10 @@ export function SharedReceipt() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-4">
-          <div className="flex justify-between items-center text-xl border-t pt-4 mt-4">
-            <span className="font-bold">Total:</span>
-            <span className="font-bold text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
+        <div className="bg-forest rounded-lg p-4">
+          <div className="flex justify-between items-center text-lg border-t border-beige/20 pt-3 mt-3">
+            <span className="font-bold text-beige">Total:</span>
+            <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
           </div>
         </div>
       </div>

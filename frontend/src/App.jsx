@@ -16,14 +16,14 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-100">
-        <nav className="bg-white shadow">
-          <div className="max-w-4xl mx-auto px-4 py-4">
-            <h1 className="text-xl font-bold text-gray-800">Receipt Parser</h1>
+      <div className="min-h-screen bg-beige">
+        <nav className="bg-forest shadow-sm">
+          <div className="max-w-4xl mx-auto px-4 py-3">
+            <h1 className="text-lg font-bold text-beige">Receipt Parser</h1>
           </div>
         </nav>
 
-        <main className="py-6">
+        <main className="py-4">
           <Routes>
             <Route path="/" element={<ReceiptList />} />
             <Route path="/scan" element={<QRScanner />} />

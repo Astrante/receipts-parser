@@ -1,12 +1,19 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { exportReceiptToJSON } from '../../../core/utils/receiptShare.js';
+import { DropdownMenu } from '../shared/DropdownMenu.jsx';
+import { ScanBottomSheet } from '../ScanBottomSheet/ScanBottomSheet.jsx';
+import { AddByLinkBottomSheet } from '../AddByLinkBottomSheet/AddByLinkBottomSheet.jsx';
+import { ImportBottomSheet } from '../ImportBottomSheet/ImportBottomSheet.jsx';
 
 export function ReceiptList() {
   const { receipts, loadReceipts, deleteReceipt } = useReceiptStore();
   const navigate = useNavigate();
+  const [scanSheetOpen, setScanSheetOpen] = useState(false);
+  const [linkSheetOpen, setLinkSheetOpen] = useState(false);
+  const [importSheetOpen, setImportSheetOpen] = useState(false);
 
   useEffect(() => {
     loadReceipts();
@@ -57,28 +64,66 @@ export function ReceiptList() {
     return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
+  const dropdownTrigger = (
+    <button className="bg-forest hover:bg-forest/90 text-beige font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+      </svg>
+      New
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      </svg>
+    </button>
+  );
+
+  const dropdownItems = [
+    {
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      ),
+      label: 'Scan',
+      onClick: () => setScanSheetOpen(true)
+    },
+    {
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+      ),
+      label: 'Add by link',
+      onClick: () => setLinkSheetOpen(true)
+    },
+    {
+      icon: (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+        </svg>
+      ),
+      label: 'Import',
+      onClick: () => setImportSheetOpen(true)
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-beige p-3">
       <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">My Receipts</h1>
-          <button
-            onClick={() => navigate('/scan')}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
-          >
-            + New
-          </button>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold text-slate">My Receipts</h1>
+          <DropdownMenu trigger={dropdownTrigger} items={dropdownItems} />
         </div>
 
         {sortedReceipts.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-24 w-24 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-forest rounded-lg p-8 text-center">
+            <svg className="mx-auto h-16 w-16 text-beige/60 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-gray-500 text-lg mb-4">No receipts yet</p>
+            <p className="text-beige/80 mb-4">No receipts yet</p>
             <button
-              onClick={() => navigate('/scan')}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+              onClick={() => setScanSheetOpen(true)}
+              className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
             >
               Add Your First Receipt
             </button>
@@ -92,68 +137,61 @@ export function ReceiptList() {
                 <div
                   key={receipt.id}
                   onClick={() => navigate(`/receipt/${receipt.id}`)}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow cursor-pointer group"
+                  className="bg-forest rounded-lg hover:shadow-md transition-shadow cursor-pointer group"
                 >
-                  <div className="p-4">
-                    {/* Header: Store name + Actions buttons */}
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="font-semibold text-lg text-gray-800 flex-1">{receipt.storeName}</h3>
-                      <div className="flex gap-2">
+                  <div className="p-3">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-beige flex-1">{receipt.storeName}</h3>
+                      <div className="flex gap-1">
                         <button
                           onClick={(e) => handleExport(receipt, e)}
-                          className="text-gray-400 hover:text-blue-500 hover:bg-blue-50 text-base leading-none p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                          title="Скачать JSON"
+                          className="text-beige/60 hover:text-terracotta hover:bg-beige/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          title="Download JSON"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                           </svg>
                         </button>
                         <button
                           onClick={(e) => handleDelete(receipt.id, e)}
-                          className="text-gray-400 hover:text-red-500 hover:bg-red-50 text-base leading-none p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                          title="Удалить чек"
+                          className="text-beige/60 hover:text-terracotta hover:bg-beige/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          title="Delete receipt"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                           </svg>
                         </button>
                       </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="border-t border-gray-200 my-3"></div>
-
-                    {/* Two column layout */}
-                    <div className="grid grid-cols-2 gap-4">
-                      {/* Left column: Date and Items count */}
-                      <div className="space-y-2">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <div className="flex items-center text-xs text-beige/80">
+                          <svg className="w-3.5 h-3.5 mr-1.5 text-beige/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           {formatDateTime(receipt.date)}
                         </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <svg className="w-4 h-4 mr-2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        <div className="flex items-center text-xs text-beige/80">
+                          <svg className="w-3.5 h-3.5 mr-1.5 text-beige/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                           </svg>
-                          {receipt.products.length} items
+                          {receipt.products.length}
                         </div>
                       </div>
 
-                      {/* Right column: Buyer breakdown or Total */}
                       <div className="text-right">
                         {buyersBreakdown && buyersBreakdown.length > 0 ? (
-                          <div className="space-y-1">
+                          <div className="space-y-0.5">
                             {buyersBreakdown.map((buyer, idx) => (
-                              <div key={idx} className="text-sm">
-                                <span className="text-gray-600">{buyer.name}:</span>{' '}
-                                <span className="font-semibold text-gray-800">{buyer.share.toFixed(2)} RSD</span>
+                              <div key={idx} className="text-xs">
+                                <span className="text-beige/80">{buyer.name}:</span>{' '}
+                                <span className="font-semibold text-beige">{buyer.share.toFixed(2)} RSD</span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="font-bold text-xl text-gray-800">
+                          <div className="font-bold text-lg text-beige">
                             {receipt.totalAmount.toFixed(2)} RSD
                           </div>
                         )}
@@ -165,6 +203,10 @@ export function ReceiptList() {
             })}
           </div>
         )}
+
+        <ScanBottomSheet isOpen={scanSheetOpen} onClose={() => setScanSheetOpen(false)} />
+        <AddByLinkBottomSheet isOpen={linkSheetOpen} onClose={() => setLinkSheetOpen(false)} />
+        <ImportBottomSheet isOpen={importSheetOpen} onClose={() => setImportSheetOpen(false)} />
       </div>
     </div>
   );

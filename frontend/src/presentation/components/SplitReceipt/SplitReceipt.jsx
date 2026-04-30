@@ -263,15 +263,15 @@ export function SplitReceipt() {
 
   if (!receipt) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-beige p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500">Receipt not found</p>
+          <div className="bg-forest rounded-lg p-6 text-center">
+            <p className="text-beige/80">Receipt not found</p>
             <button
               onClick={() => navigate('/')}
-              className="mt-4 text-blue-500 hover:text-blue-700"
+              className="mt-3 text-terracotta hover:text-terracotta/80 font-medium"
             >
-              Back to Receipts
+              ← Back to Receipts
             </button>
           </div>
         </div>
@@ -283,27 +283,28 @@ export function SplitReceipt() {
   const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-beige p-3">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-4 flex justify-between items-start">
-          <div className="flex items-center gap-4">
+        <div className="mb-3 flex justify-between items-start">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(`/receipt/${receipt.id}`)}
-              className="text-blue-500 hover:text-blue-700"
+              className="text-slate hover:text-forest flex items-center gap-1 text-sm font-medium"
             >
-              ← Back
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
             </button>
           </div>
         </div>
 
-        <h1 className="text-3xl font-bold mb-6">Split Receipt</h1>
+        <h1 className="text-2xl font-bold mb-4 text-slate">Split Receipt</h1>
 
-        {/* Add Buyers */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Buyers</h2>
+        <div className="bg-forest rounded-lg p-4 mb-4">
+          <h2 className="text-base font-semibold mb-3 text-beige">Buyers</h2>
           <div className="relative">
-            <div className="flex gap-2 mb-4">
+            <div className="flex gap-2 mb-3">
               <div className="flex-1 relative">
                 <input
                   type="text"
@@ -314,21 +315,21 @@ export function SplitReceipt() {
                   }}
                   onFocus={() => setShowBuyerDropdown(true)}
                   placeholder="Buyer name or select from list"
-                  className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                  className="w-full border border-beige/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50 text-sm"
+                  onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                   autoComplete="off"
                 />
                 {showBuyerDropdown && savedBuyers.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-forest border border-beige/30 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {savedBuyers
                       .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
                       .map(buyer => (
                         <div
                           key={buyer.id}
                           onClick={() => selectBuyer(buyer)}
-                          className="p-3 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                          className="p-2 hover:bg-beige/10 cursor-pointer border-b border-beige/10 last:border-b-0"
                         >
-                          <div className="font-medium">{buyer.name}</div>
+                          <div className="font-medium text-beige text-sm">{buyer.name}</div>
                         </div>
                       ))}
                   </div>
@@ -336,37 +337,39 @@ export function SplitReceipt() {
               </div>
               <button
                 onClick={addBuyer}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg transition-colors flex items-center gap-1"
+                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-1 text-sm"
               >
-                <span className="text-lg leading-none">+</span>
-                <span>Add Buyer</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add
               </button>
             </div>
           </div>
 
           {buyers.length === 0 ? (
-            <p className="text-gray-500 text-center py-4">
+            <p className="text-beige/60 text-center py-3 text-sm">
               Add a buyer to start splitting the receipt
             </p>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {buyers.map((buyer) => {
                 const total = calculateBuyerShare(buyer.id, receipt);
                 return (
-                  <div key={buyer.id} className="bg-gray-50 p-4 rounded-lg border">
+                  <div key={buyer.id} className="bg-beige/10 p-3 rounded-lg border border-beige/20">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold">
+                      <h3 className="font-semibold text-beige text-sm">
                         {buyer.name}
                       </h3>
                       <button
                         onClick={() => removeBuyer(buyer.id)}
-                        className="text-red-500 hover:text-red-700 text-sm font-bold"
+                        className="text-terracotta hover:text-terracotta/80 text-sm font-bold"
                       >
                         ×
                       </button>
                     </div>
-                    <p className="text-lg font-bold text-blue-600">
-                      {total.toFixed(2)} RSD
+                    <p className="text-base font-bold text-terracotta">
+                      {total.toFixed(2)}
                     </p>
                   </div>
                 );
@@ -375,41 +378,40 @@ export function SplitReceipt() {
           )}
         </div>
 
-        {/* Product Distribution Table */}
         {buyers.length > 0 && (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-forest rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
+              <table className="w-full text-sm">
+                <thead className="bg-beige/10">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold">Product</th>
-                    <th className="px-4 py-3 text-right font-semibold">Qty</th>
-                    <th className="px-4 py-3 text-right font-semibold">Unit Price</th>
-                    <th className="px-4 py-3 text-right font-semibold">Total</th>
+                    <th className="px-3 py-2 text-left font-semibold text-beige text-xs">Product</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Qty</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Unit</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-4 py-3 text-center font-semibold min-w-[120px]">
+                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-beige text-xs min-w-[100px]">
                         {buyer.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-beige/10">
                   {receipt.products.map(product => {
                     const unitPrice = product.total / product.quantity;
                     const currentDist = product.distribution || {};
 
                     return (
                       <tr key={product.id}>
-                        <td className="px-4 py-3">
-                          <div className="font-medium">{product.name}</div>
+                        <td className="px-3 py-2">
+                          <div className="font-medium text-beige text-xs">{product.name}</div>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
                           {unitPrice.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold">
+                        <td className="px-3 py-2 text-right font-semibold text-beige text-xs">
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
@@ -420,7 +422,7 @@ export function SplitReceipt() {
                             : share;
 
                           return (
-                            <td key={buyer.id} className="px-4 py-3 text-center">
+                            <td key={buyer.id} className="px-3 py-2 text-center">
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -432,10 +434,10 @@ export function SplitReceipt() {
                                   buyer.id,
                                   e.target.value
                                 )}
-                                className="w-20 border border-gray-300 p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-16 border border-beige/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige text-xs"
                               />
-                              <div className="text-xs text-gray-500 mt-1">
-                                {(share * unitPrice).toFixed(2)} RSD
+                              <div className="text-xs text-beige/60 mt-0.5">
+                                {(share * unitPrice).toFixed(2)}
                               </div>
                             </td>
                           );
@@ -444,19 +446,19 @@ export function SplitReceipt() {
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-gray-50 border-t-2">
+                <tfoot className="bg-beige/10 border-t-2 border-beige/20">
                   <tr>
-                    <td className="px-4 py-3 text-right font-bold text-lg" colSpan="3">
+                    <td className="px-3 py-2 text-right font-bold text-beige" colSpan="3">
                       Total:
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-lg">
-                      {receipt.totalAmount.toFixed(2)} RSD
+                    <td className="px-3 py-2 text-right font-bold text-beige">
+                      {receipt.totalAmount.toFixed(2)}
                     </td>
                     {buyers.map(buyer => {
                       const total = calculateBuyerShare(buyer.id, receipt);
                       return (
-                        <td key={buyer.id} className="px-4 py-3 text-right font-bold text-lg text-blue-600">
-                          {total.toFixed(2)} RSD
+                        <td key={buyer.id} className="px-3 py-2 text-right font-bold text-terracotta">
+                          {total.toFixed(2)}
                         </td>
                       );
                     })}

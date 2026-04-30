@@ -292,15 +292,15 @@ export function ReceiptDetail() {
 
   if (!receipt) {
     return (
-      <div className="min-h-screen bg-gray-100 p-4">
+      <div className="min-h-screen bg-beige p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500">Receipt not found</p>
+          <div className="bg-forest rounded-lg p-6 text-center">
+            <p className="text-beige/80">Receipt not found</p>
             <button
               onClick={() => navigate('/')}
-              className="mt-4 text-blue-500 hover:text-blue-700"
+              className="mt-3 text-terracotta hover:text-terracotta/80 font-medium"
             >
-              Back to Receipts
+              ← Back to Receipts
             </button>
           </div>
         </div>
@@ -318,30 +318,34 @@ export function ReceiptDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-beige p-3">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-4 flex justify-between items-start">
-          <div className="flex items-center gap-4">
+        <div className="mb-3 flex justify-between items-start">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
-              className="text-blue-500 hover:text-blue-700"
+              className="text-slate hover:text-forest flex items-center gap-1 text-sm font-medium"
             >
-              ← Back
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
             </button>
             {!hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-                className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-1"
+                className="bg-terracotta hover:bg-terracotta/90 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-1"
               >
-                <span className="text-lg leading-none">+</span>
-                <span>Add Buyer</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Add Buyer
               </button>
             )}
             {hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-                className="bg-blue-500 hover:bg-blue-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors"
+                className="bg-forest hover:bg-forest/90 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors"
               >
                 Edit Split
               </button>
@@ -349,71 +353,71 @@ export function ReceiptDetail() {
           </div>
           <button
             onClick={handleDelete}
-            className="text-red-500 hover:text-red-700 text-3xl font-bold leading-none"
+            className="text-slate/60 hover:text-terracotta text-2xl font-bold leading-none p-1"
             title="Delete receipt"
           >
             ×
           </button>
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Left Column - Receipt Content */}
-          <div className="lg:col-span-3 space-y-4">
-            {/* Receipt Header */}
-            <div className="bg-white rounded-lg shadow p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          <div className="lg:col-span-3 space-y-3">
+            <div className="bg-forest rounded-lg p-4">
               {isEditingStore ? (
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={editedStoreName}
                     onChange={(e) => setEditedStoreName(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSaveStoreName()}
-                    className="flex-1 text-2xl font-bold border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onKeyDown={(e) => e.key === 'Enter' && handleSaveStoreName()}
+                    className="flex-1 text-xl font-bold border border-beige/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige"
                     autoFocus
                   />
                   <button
                     onClick={handleSaveStoreName}
-                    className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm"
                   >
                     Save
                   </button>
                   <button
                     onClick={handleCancelStoreName}
-                    className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded-lg transition-colors"
+                    className="bg-slate/50 hover:bg-slate/70 text-beige font-medium py-2 px-3 rounded-lg transition-colors text-sm"
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <h1 className="text-2xl font-bold mb-2">{receipt.storeName}</h1>
+                  <h1 className="text-xl font-bold text-beige">{receipt.storeName}</h1>
                   <button
                     onClick={handleEditStoreName}
-                    className="text-gray-400 hover:text-gray-600 text-2xl"
+                    className="text-beige/60 hover:text-terracotta p-1"
                     title="Edit store name"
                   >
-                    ✏️
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
                   </button>
                 </div>
               )}
-              <p className="text-gray-500">
+              <p className="text-beige/70 text-sm">
                 {formatDateTime(receipt.date)}
               </p>
             </div>
 
-            {/* Buyers - compact version for mobile */}
             {hasBuyers && (
-              <div className="lg:hidden bg-white rounded-lg shadow p-4">
+              <div className="lg:hidden bg-forest rounded-lg p-3">
                 <button
                   onClick={() => setIsBuyersCollapsed(!isBuyersCollapsed)}
-                  className="w-full flex items-center justify-between text-lg font-semibold mb-3"
+                  className="w-full flex items-center justify-between font-semibold mb-2 text-beige"
                 >
-                  <span>Buyers ({buyers.length})</span>
-                  <span className="text-gray-500">{isBuyersCollapsed ? '▼' : '▲'}</span>
+                  <span className="text-sm">Buyers ({buyers.length})</span>
+                  <svg className={`w-4 h-4 text-beige/60 transition-transform ${isBuyersCollapsed ? '' : '-rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
                 {!isBuyersCollapsed && (
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     <div className="flex gap-2">
                       <input
                         type="text"
@@ -424,30 +428,32 @@ export function ReceiptDetail() {
                         }}
                         onFocus={() => setShowBuyerDropdown(true)}
                         placeholder="Add buyer..."
-                        className="flex-1 border border-gray-300 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                        className="flex-1 border border-beige/30 p-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50"
+                        onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                         autoComplete="off"
                       />
                       <button
                         onClick={addBuyer}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                        className="bg-terracotta hover:bg-terracotta/90 text-white px-3 py-2 rounded-lg"
                       >
-                        +
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
                       </button>
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       {buyers.map((buyer) => {
                         const total = calculateBuyerShare(buyer.id, receipt);
                         return (
-                          <div key={buyer.id} className="bg-gray-50 p-3 rounded-lg border relative">
+                          <div key={buyer.id} className="bg-beige/10 p-2 rounded-lg border border-beige/20 relative">
                             <button
                               onClick={() => removeBuyer(buyer.id)}
-                              className="absolute top-1 right-1 text-red-500 hover:text-red-700 text-xs"
+                              className="absolute top-1 right-1 text-terracotta hover:text-terracotta/80 text-xs"
                             >
                               ×
                             </button>
-                            <h3 className="font-semibold text-sm pr-4">{buyer.name}</h3>
-                            <p className="text-base font-bold text-blue-600">
+                            <h3 className="font-semibold text-xs pr-4 text-beige">{buyer.name}</h3>
+                            <p className="text-sm font-bold text-terracotta">
                               {total.toFixed(2)} RSD
                             </p>
                           </div>
@@ -459,41 +465,40 @@ export function ReceiptDetail() {
               </div>
             )}
 
-        {/* Product Distribution Table */}
         {hasBuyers ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="bg-forest rounded-lg overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
+              <table className="w-full text-sm">
+                <thead className="bg-beige/10">
                   <tr>
-                    <th className="px-4 py-3 text-left font-semibold">Product</th>
-                    <th className="px-4 py-3 text-right font-semibold">Qty</th>
-                    <th className="px-4 py-3 text-right font-semibold">Unit Price</th>
-                    <th className="px-4 py-3 text-right font-semibold">Total</th>
+                    <th className="px-3 py-2 text-left font-semibold text-beige text-xs">Product</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Qty</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Unit</th>
+                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-4 py-3 text-center font-semibold min-w-[120px]">
+                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-beige text-xs min-w-[100px]">
                         {buyer.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-beige/10">
                   {receipt.products.map(product => {
                     const unitPrice = product.total / product.quantity;
                     const currentDist = product.distribution || {};
 
                     return (
                       <tr key={product.id}>
-                        <td className="px-4 py-3">
-                          <div className="font-medium">{product.name}</div>
+                        <td className="px-3 py-2">
+                          <div className="font-medium text-beige text-xs">{product.name}</div>
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
                           {unitPrice.toFixed(2)}
                         </td>
-                        <td className="px-4 py-3 text-right font-semibold">
+                        <td className="px-3 py-2 text-right font-semibold text-beige text-xs">
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
@@ -504,7 +509,7 @@ export function ReceiptDetail() {
                             : share;
 
                           return (
-                            <td key={buyer.id} className="px-4 py-3 text-center">
+                            <td key={buyer.id} className="px-3 py-2 text-center">
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -512,10 +517,10 @@ export function ReceiptDetail() {
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
                                 onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                                className="w-20 border border-gray-300 p-2 rounded text-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-16 border border-beige/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige text-xs"
                               />
-                              <div className="text-xs text-gray-500 mt-1">
-                                {(share * unitPrice).toFixed(2)} RSD
+                              <div className="text-xs text-beige/60 mt-0.5">
+                                {(share * unitPrice).toFixed(2)}
                               </div>
                             </td>
                           );
@@ -524,19 +529,19 @@ export function ReceiptDetail() {
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-gray-50 border-t-2">
+                <tfoot className="bg-beige/10 border-t-2 border-beige/20">
                   <tr>
-                    <td className="px-4 py-3 text-right font-bold text-lg" colSpan="3">
+                    <td className="px-3 py-2 text-right font-bold text-beige" colSpan="3">
                       Total:
                     </td>
-                    <td className="px-4 py-3 text-right font-bold text-lg">
-                      {receipt.totalAmount.toFixed(2)} RSD
+                    <td className="px-3 py-2 text-right font-bold text-beige">
+                      {receipt.totalAmount.toFixed(2)}
                     </td>
                     {buyers.map(buyer => {
                       const total = calculateBuyerShare(buyer.id, receipt);
                       return (
-                        <td key={buyer.id} className="px-4 py-3 text-right font-bold text-lg text-blue-600">
-                          {total.toFixed(2)} RSD
+                        <td key={buyer.id} className="px-3 py-2 text-right font-bold text-terracotta">
+                          {total.toFixed(2)}
                         </td>
                       );
                     })}
@@ -546,22 +551,21 @@ export function ReceiptDetail() {
             </div>
           </div>
         ) : (
-          /* Products List - simple view when no buyers */
-          <div className="bg-white rounded-lg shadow overflow-hidden mb-4">
-            <div className="p-4 bg-gray-50 border-b">
-              <h2 className="font-semibold text-lg">Products ({receipt.products.length})</h2>
+          <div className="bg-forest rounded-lg overflow-hidden mb-3">
+            <div className="p-3 bg-beige/10 border-b border-beige/20">
+              <h2 className="font-semibold text-beige text-sm">Products ({receipt.products.length})</h2>
             </div>
-            <div className="divide-y">
+            <div className="divide-y divide-beige/10">
               {receipt.products.map((product) => (
-                <div key={product.id} className="p-4 flex justify-between items-center">
+                <div key={product.id} className="p-3 flex justify-between items-center">
                   <div className="flex-1">
-                    <h3 className="font-medium text-gray-800">{product.name}</h3>
-                    <p className="text-sm text-gray-500">
-                      {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)} RSD
+                    <h3 className="font-medium text-beige text-sm">{product.name}</h3>
+                    <p className="text-xs text-beige/70">
+                      {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-lg">{product.total.toFixed(2)} RSD</p>
+                    <p className="font-bold text-beige">{product.total.toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -569,42 +573,41 @@ export function ReceiptDetail() {
           </div>
         )}
 
-            {/* Summary */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <div className="flex justify-between items-center text-lg mb-2">
-                <span className="text-gray-600">Subtotal:</span>
-                <span className="font-semibold">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)} RSD</span>
+            <div className="bg-forest rounded-lg p-4">
+              <div className="flex justify-between items-center text-sm mb-1.5">
+                <span className="text-beige/70">Subtotal:</span>
+                <span className="font-semibold text-beige">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center text-lg mb-2">
-                <span className="text-gray-600">VAT:</span>
-                <span className="font-semibold">{receipt.taxAmount.toFixed(2)} RSD</span>
+              <div className="flex justify-between items-center text-sm mb-1.5">
+                <span className="text-beige/70">VAT:</span>
+                <span className="font-semibold text-beige">{receipt.taxAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center text-xl border-t pt-2 mt-2">
-                <span className="font-bold">Total:</span>
-                <span className="font-bold text-blue-600">{receipt.totalAmount.toFixed(2)} RSD</span>
+              <div className="flex justify-between items-center base border-t border-beige/20 pt-1.5 mt-1.5">
+                <span className="font-bold text-beige">Total:</span>
+                <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
               </div>
             </div>
 
-            {/* Actions */}
             <div>
               <button
                 onClick={() => window.open(receipt.originalUrl, '_blank')}
-                className="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="w-full bg-beige/20 hover:bg-beige/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
-                View Original Receipt
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                View Original
               </button>
             </div>
           </div>
 
-          {/* Right Column - Buyers Sidebar (Desktop only) */}
           {hasBuyers && (
             <div className="hidden lg:block lg:col-span-1">
-              <div className="bg-white rounded-lg shadow p-4 sticky top-4">
-                <h3 className="text-lg font-semibold mb-3">Buyers</h3>
+              <div className="bg-forest rounded-lg p-3 sticky top-4">
+                <h3 className="font-semibold mb-2 text-beige text-sm">Buyers</h3>
 
-                {/* Add Buyer Form */}
-                <div className="mb-4">
-                  <div className="flex gap-2 mb-3">
+                <div className="mb-3">
+                  <div className="flex gap-2 mb-2">
                     <input
                       type="text"
                       value={newBuyerName}
@@ -614,29 +617,31 @@ export function ReceiptDetail() {
                       }}
                       onFocus={() => setShowBuyerDropdown(true)}
                       placeholder="Add buyer..."
-                      className="flex-1 border border-gray-300 p-2 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      onKeyPress={(e) => e.key === 'Enter' && addBuyer()}
+                      className="flex-1 border border-beige/30 p-2 rounded text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50"
+                      onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                       autoComplete="off"
                     />
                     <button
                       onClick={addBuyer}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded text-sm"
+                      className="bg-terracotta hover:bg-terracotta/90 text-white px-3 py-2 rounded text-xs"
                     >
-                      +
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
                     </button>
                   </div>
                   {showBuyerDropdown && savedBuyers.length > 0 && (
                     <div className="relative">
-                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-forest border border-beige/30 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                         {savedBuyers
                           .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
                           .map(buyer => (
                             <div
                               key={buyer.id}
                               onClick={() => selectBuyer(buyer)}
-                              className="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0 text-sm"
+                              className="p-2 hover:bg-beige/10 cursor-pointer border-b border-beige/10 last:border-b-0 text-xs"
                             >
-                              <div className="font-medium">{buyer.name}</div>
+                              <div className="font-medium text-beige">{buyer.name}</div>
                             </div>
                           ))}
                       </div>
@@ -644,21 +649,20 @@ export function ReceiptDetail() {
                   )}
                 </div>
 
-                {/* Buyers List */}
                 <div className="space-y-2">
                   {buyers.map((buyer) => {
                     const total = calculateBuyerShare(buyer.id, receipt);
                     return (
-                      <div key={buyer.id} className="bg-gray-50 p-3 rounded-lg border relative group">
+                      <div key={buyer.id} className="bg-beige/10 p-3 rounded-lg border border-beige/20 relative group">
                         <button
                           onClick={() => removeBuyer(buyer.id)}
-                          className="absolute top-2 right-2 text-red-500 hover:text-red-700 text-sm opacity-0 group-hover:opacity-100"
+                          className="absolute top-2 right-2 text-terracotta hover:text-terracotta/80 text-xs opacity-0 group-hover:opacity-100"
                         >
                           ×
                         </button>
-                        <h3 className="font-semibold text-sm pr-4">{buyer.name}</h3>
-                        <p className="text-lg font-bold text-blue-600">
-                          {total.toFixed(2)} RSD
+                        <h3 className="font-semibold text-xs pr-4 text-beige">{buyer.name}</h3>
+                        <p className="text-base font-bold text-terracotta">
+                          {total.toFixed(2)}
                         </p>
                       </div>
                     );
