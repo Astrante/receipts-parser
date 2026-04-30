@@ -490,15 +490,13 @@ export function ReceiptDetail() {
               const currentDist = product.distribution || {};
 
               return (
-                <div key={product.id} className="bg-beige rounded-lg p-3 shadow-md">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</h3>
-                    <div className="text-right" style={{ fontSize: '11px', color: '#4A4A4A' }}>
-                      <div>{product.quantity} × {unitPrice.toFixed(2)}</div>
-                      <div className="font-semibold text-forest">{product.total.toFixed(2)}</div>
+                <div key={product.id} className="bg-beige rounded-lg shadow-md">
+                  <div className="grid grid-cols-[minmax(140px,1fr)_repeat(auto-fit,minmax(70px,1fr))] gap-2 p-2">
+                    <div className="flex flex-col justify-center">
+                      <h3 className="font-medium text-forest mb-1" style={{ fontSize: '11px' }}>{product.name}</h3>
+                      <div style={{ fontSize: '11px', color: '#4A4A4A' }}>{product.quantity} × {unitPrice.toFixed(2)}</div>
+                      <div className="font-semibold text-forest" style={{ fontSize: '11px' }}>{product.total.toFixed(2)}</div>
                     </div>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {buyers.map(buyer => {
                       const share = currentDist[buyer.id] || 0;
                       const inputKey = `${product.id}-${buyer.id}`;
@@ -508,7 +506,7 @@ export function ReceiptDetail() {
 
                       return (
                         <div key={buyer.id} className="bg-forest/5 rounded p-2">
-                          <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                          <div className="text-xs text-forest/70 mb-1 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
                           <input
                             type="text"
                             inputMode="numeric"
@@ -529,21 +527,21 @@ export function ReceiptDetail() {
                 </div>
               );
             })}
-            <div className="bg-beige rounded-lg p-3 shadow-md">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            <div className="bg-beige rounded-lg p-2 shadow-md">
+              <div className="grid grid-cols-[minmax(140px,1fr)_repeat(auto-fit,minmax(70px,1fr))] gap-2 bg-forest/10 -mx-2 px-2 py-2 rounded-lg">
+                <div className="flex flex-col justify-center font-semibold text-forest" style={{ fontSize: '11px' }}>
+                  Total
+                </div>
                 {buyers.map(buyer => {
                   const total = calculateBuyerShare(buyer.id, receipt);
                   return (
-                    <div key={buyer.id} className="bg-forest/10 rounded p-2 text-center">
-                      <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>{buyer.name}</div>
-                      <div className="font-semibold text-terracotta" style={{ fontSize: '12px' }}>{total.toFixed(2)}</div>
+                    <div key={buyer.id} className="flex flex-col justify-center">
+                      <div className="font-semibold text-terracotta text-center" style={{ fontSize: '11px' }}>
+                        {total.toFixed(2)}
+                      </div>
                     </div>
                   );
                 })}
-                <div className="bg-forest/10 rounded p-2 text-center col-span-2 sm:col-span-3 lg:col-span-4">
-                  <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>Total</div>
-                  <div className="font-semibold text-forest" style={{ fontSize: '12px' }}>{receipt.totalAmount.toFixed(2)}</div>
-                </div>
               </div>
             </div>
           </div>
