@@ -310,7 +310,6 @@ export function ReceiptDetail() {
 
   const buyers = receipt.buyers || [];
   const hasBuyers = buyers.length > 0;
-  const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
 
   const formatDateTime = (date) => {
     const d = new Date(date);
@@ -485,111 +484,84 @@ export function ReceiptDetail() {
             )}
 
         {hasBuyers ? (
-          <div className="bg-beige rounded-lg overflow-hidden shadow-md">
-            <div className="overflow-x-auto">
-              <table className="w-full" style={{ fontSize: '13px' }}>
-                <thead className="bg-forest/10">
-                  <tr>
-                    <th className="px-3 py-1.5 text-left font-semibold text-forest" style={{ fontSize: '11px' }}>Product</th>
-                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Qty</th>
-                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Unit</th>
-                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Total</th>
-                    {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-3 py-1.5 text-center font-semibold text-forest min-w-[100px]" style={{ fontSize: '11px' }}>
-                        {buyer.name}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-forest/10">
-                  {receipt.products.map(product => {
-                    const unitPrice = product.total / product.quantity;
-                    const currentDist = product.distribution || {};
+          <div className="space-y-2">
+            {receipt.products.map(product => {
+              const unitPrice = product.total / product.quantity;
+              const currentDist = product.distribution || {};
 
-                    return (
-                      <tr key={product.id}>
-                        <td className="px-3 py-1.5">
-                          <div className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</div>
-                        </td>
-                        <td className="px-3 py-1.5 text-right" style={{ color: '#4A4A4A', fontSize: '12px' }}>
-                          {product.quantity} {product.unit}
-                        </td>
-                        <td className="px-3 py-1.5 text-right" style={{ color: '#4A4A4A', fontSize: '12px' }}>
-                          {unitPrice.toFixed(2)}
-                        </td>
-                        <td className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '12px' }}>
-                          {product.total.toFixed(2)}
-                        </td>
-                        {buyers.map(buyer => {
-                          const share = currentDist[buyer.id] || 0;
-                          const inputKey = `${product.id}-${buyer.id}`;
-                          const inputValue = tempInputValues[inputKey] !== undefined
-                            ? tempInputValues[inputKey]
-                            : share;
-
-                          return (
-                            <td key={buyer.id} className="px-3 py-1.5 text-center">
-                              <input
-                                type="text"
-                                inputMode="numeric"
-                                value={inputValue}
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
-                                onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                                className="w-16 border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
-                                style={{ fontSize: '12px' }}
-                              />
-                              <div style={{ fontSize: '11px', color: '#4A4A4A', marginTop: '2px' }}>
-                                {(share * unitPrice).toFixed(2)}
-                              </div>
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
-                </tbody>
-                <tfoot className="bg-forest/10 border-t border-forest/20">
-                  <tr>
-                    <td className="px-3 py-1.5 text-right font-semibold text-forest" colSpan="3" style={{ fontSize: '12px' }}>
-                      Total:
-                    </td>
-                    <td className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '12px' }}>
-                      {receipt.totalAmount.toFixed(2)}
-                    </td>
+              return (
+                <div key={product.id} className="bg-beige rounded-lg p-3 shadow-md">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</h3>
+                    <div className="text-right" style={{ fontSize: '11px', color: '#4A4A4A' }}>
+                      <div>{product.quantity} × {unitPrice.toFixed(2)}</div>
+                      <div className="font-semibold text-forest">{product.total.toFixed(2)}</div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                     {buyers.map(buyer => {
-                      const total = calculateBuyerShare(buyer.id, receipt);
+                      const share = currentDist[buyer.id] || 0;
+                      const inputKey = `${product.id}-${buyer.id}`;
+                      const inputValue = tempInputValues[inputKey] !== undefined
+                        ? tempInputValues[inputKey]
+                        : share;
+
                       return (
-                        <td key={buyer.id} className="px-3 py-1.5 text-right font-semibold text-terracotta" style={{ fontSize: '12px' }}>
-                          {total.toFixed(2)}
-                        </td>
+                        <div key={buyer.id} className="bg-forest/5 rounded p-2">
+                          <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            value={inputValue}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
+                            onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
+                            className="w-full border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
+                            style={{ fontSize: '11px' }}
+                          />
+                          <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
+                            {(share * unitPrice).toFixed(2)}
+                          </div>
+                        </div>
                       );
                     })}
-                  </tr>
-                </tfoot>
-              </table>
+                  </div>
+                </div>
+              );
+            })}
+            <div className="bg-beige rounded-lg p-3 shadow-md">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                {buyers.map(buyer => {
+                  const total = calculateBuyerShare(buyer.id, receipt);
+                  return (
+                    <div key={buyer.id} className="bg-forest/10 rounded p-2 text-center">
+                      <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                      <div className="font-semibold text-terracotta" style={{ fontSize: '12px' }}>{total.toFixed(2)}</div>
+                    </div>
+                  );
+                })}
+                <div className="bg-forest/10 rounded p-2 text-center col-span-2 sm:col-span-3 lg:col-span-4">
+                  <div className="text-xs text-forest/70 mb-1" style={{ fontSize: '10px' }}>Total</div>
+                  <div className="font-semibold text-forest" style={{ fontSize: '12px' }}>{receipt.totalAmount.toFixed(2)}</div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
-          <div className="bg-beige rounded-lg overflow-hidden mb-3 shadow-md">
-            <div className="p-3 bg-forest/10 border-b border-forest/20">
-              <h2 className="font-semibold text-forest" style={{ fontSize: '13px' }}>Products ({receipt.products.length})</h2>
-            </div>
-            <div className="divide-y divide-forest/10">
-              {receipt.products.map((product) => (
-                <div key={product.id} className="p-3 flex justify-between items-center">
-                  <div className="flex-1">
-                    <h3 className="font-medium text-forest" style={{ fontSize: '13px' }}>{product.name}</h3>
-                    <p style={{ fontSize: '12px', color: '#4A4A4A' }}>
-                      {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-forest" style={{ fontSize: '13px' }}>{product.total.toFixed(2)}</p>
-                  </div>
+          <div className="space-y-2">
+            {receipt.products.map((product) => (
+              <div key={product.id} className="bg-beige rounded-lg p-3 shadow-md flex justify-between items-center">
+                <div className="flex-1">
+                  <h3 className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</h3>
+                  <p style={{ fontSize: '11px', color: '#4A4A4A' }}>
+                    {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
+                  </p>
                 </div>
-              ))}
-            </div>
+                <div className="text-right">
+                  <p className="font-semibold text-forest" style={{ fontSize: '12px' }}>{product.total.toFixed(2)}</p>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
