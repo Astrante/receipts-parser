@@ -27,7 +27,7 @@ export function DropdownMenu({ trigger, items }) {
       </div>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-xl overflow-hidden shadow-lg py-1 z-50 border" style={{
+        <div className="absolute right-0 mt-2 w-52 rounded-xl overflow-hidden shadow-lg py-1 z-50 border" style={{
           backgroundColor: '#F5E6CC',
           boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
           borderColor: 'rgba(45,79,30,0.15)'
@@ -39,18 +39,18 @@ export function DropdownMenu({ trigger, items }) {
                 item.onClick();
                 setIsOpen(false);
               }}
-              className="w-full text-left flex items-center gap-3 transition-colors"
+              className="w-full text-left flex items-center gap-2 transition-colors"
               style={{
-                padding: '14px 18px',
+                padding: '8px 12px',
                 borderBottom: index < items.length - 1 ? '0.5px solid rgba(45,79,30,0.12)' : 'none',
                 color: '#2D4F1E',
-                fontSize: '15px',
+                fontSize: '14px',
                 fontWeight: '400'
               }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(45,79,30,0.08)'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
-              <div style={{ width: '18px', height: '18px', color: '#2D4F1E' }}>
+              <div style={{ width: '16px', height: '16px', color: '#2D4F1E' }}>
                 {item.icon}
               </div>
               <span>{item.label}</span>
