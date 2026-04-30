@@ -27,7 +27,7 @@ export function DropdownMenu({ trigger, items }) {
       </div>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-52 rounded-xl overflow-hidden shadow-lg py-1 z-50 border" style={{
+        <div className="absolute right-0 mt-2 w-48 rounded-xl overflow-hidden shadow-lg z-50 border" style={{
           backgroundColor: '#F5E6CC',
           boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
           borderColor: 'rgba(45,79,30,0.15)'
@@ -41,7 +41,7 @@ export function DropdownMenu({ trigger, items }) {
               }}
               className="w-full text-left flex items-center gap-2 transition-colors"
               style={{
-                padding: '8px 12px',
+                padding: '8px 8px 8px 10px',
                 borderBottom: index < items.length - 1 ? '0.5px solid rgba(45,79,30,0.12)' : 'none',
                 color: '#2D4F1E',
                 fontSize: '14px',
