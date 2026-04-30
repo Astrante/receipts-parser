@@ -68,16 +68,18 @@ export function BottomSheet({ isOpen, onClose, children }) {
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60"
+      className="fixed inset-0 z-50 lg:flex items-center justify-center bg-black/60 p-4"
     >
       <div
         ref={sheetRef}
-        className="w-full max-w-lg bg-beige rounded-t-2xl shadow-2xl transform transition-transform duration-300 ease-out max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg bg-beige shadow-2xl transform transition-all duration-300 ease-out max-h-[90vh] overflow-y-auto
+                  lg:rounded-2xl lg:my-8 animate-fadeIn
+                  rounded-t-2xl mt-auto lg:mt-8"
       >
-        <div className="flex justify-center pt-2 pb-1">
+        <div className="lg:hidden flex justify-center pt-2 pb-1">
           <div className="w-12 h-1.5 bg-forest/30 rounded-full" />
         </div>
-        <div className="p-4">
+        <div className="p-4 lg:p-6">
           {children}
         </div>
       </div>
