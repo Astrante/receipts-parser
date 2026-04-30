@@ -14,7 +14,7 @@ export function ReceiptDetail() {
   const [newBuyerName, setNewBuyerName] = useState('');
   const [savedBuyers, setSavedBuyers] = useState([]);
   const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
-  const [isBuyersCollapsed, setIsBuyersCollapsed] = useState(false);
+  const [isBuyersCollapsed, setIsBuyersCollapsed] = useState(true);
 
   // Временные значения для input полей (чтобы можно было вводить)
   const [tempInputValues, setTempInputValues] = useState({});
@@ -599,8 +599,18 @@ export function ReceiptDetail() {
           {hasBuyers && (
             <div className="hidden lg:block lg:col-span-1">
               <div className="bg-beige rounded-lg p-3 sticky top-4 shadow-md">
-                <h3 className="font-semibold mb-2 text-forest" style={{ fontSize: '13px' }}>Buyers</h3>
+                <button
+                  onClick={() => setIsBuyersCollapsed(!isBuyersCollapsed)}
+                  className="w-full flex items-center justify-between font-semibold mb-2 text-forest"
+                >
+                  <span style={{ fontSize: '13px' }}>Buyers ({buyers.length})</span>
+                  <svg className={`w-4 h-4 text-forest/60 transition-transform ${isBuyersCollapsed ? '' : '-rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
 
+                {!isBuyersCollapsed && (
+                  <>
                 <div className="mb-3">
                   <div className="flex gap-2 mb-2">
                     <input
@@ -666,6 +676,8 @@ export function ReceiptDetail() {
                     );
                   })}
                 </div>
+                  </>
+                )}
               </div>
             </div>
           )}
