@@ -459,11 +459,11 @@ export function ReceiptDetail() {
                         </svg>
                       </button>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {buyers.map((buyer) => {
                         const total = calculateBuyerShare(buyer.id, receipt);
                         return (
-                          <div key={buyer.id} className="bg-forest/10 p-2 rounded-lg border border-forest/20 relative">
+                          <div key={buyer.id} className="bg-forest/10 p-2 rounded-lg border border-forest/20 relative flex-1 min-w-[140px]">
                             <button
                               onClick={() => removeBuyer(buyer.id)}
                               className="absolute top-1 right-1 text-terracotta hover:text-terracotta/80"
