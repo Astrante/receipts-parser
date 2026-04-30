@@ -321,10 +321,11 @@ export function ReceiptDetail() {
     <div className="min-h-screen bg-forest p-3">
       <div className="max-w-7xl mx-auto">
         <div className="mb-3 flex justify-between items-start">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/')}
-              className="text-beige/70 hover:text-beige flex items-center gap-1 text-sm font-medium"
+              className="text-beige/70 hover:text-beige flex items-center gap-1 font-medium"
+              style={{ fontSize: '13px' }}
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -334,7 +335,8 @@ export function ReceiptDetail() {
             {!hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-                className="bg-terracotta hover:bg-terracotta/90 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-1"
+                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-1"
+                style={{ fontSize: '12px' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -345,7 +347,8 @@ export function ReceiptDetail() {
             {hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-                className="bg-forest hover:bg-forest/90 text-beige text-xs font-medium py-2 px-3 rounded-lg transition-colors"
+                className="bg-forest hover:bg-forest/90 text-beige font-medium py-2 px-3 rounded-lg transition-colors"
+                style={{ fontSize: '12px' }}
               >
                 Edit Split
               </button>
@@ -362,7 +365,7 @@ export function ReceiptDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3 space-y-3">
-            <div className="bg-beige rounded-lg p-4 shadow-md">
+            <div className="bg-beige rounded-lg p-3 shadow-md">
               {isEditingStore ? (
                 <div className="flex items-center gap-2">
                   <input
@@ -370,39 +373,53 @@ export function ReceiptDetail() {
                     value={editedStoreName}
                     onChange={(e) => setEditedStoreName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveStoreName()}
-                    className="flex-1 text-xl font-bold border border-forest/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
+                    className="flex-1 font-semibold border border-forest/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
+                    style={{ fontSize: '15px' }}
                     autoFocus
                   />
                   <button
                     onClick={handleSaveStoreName}
-                    className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-3 rounded-lg transition-colors text-sm"
+                    className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-3 rounded-lg transition-colors"
+                    style={{ fontSize: '12px' }}
                   >
                     Save
                   </button>
                   <button
                     onClick={handleCancelStoreName}
-                    className="bg-forest/20 hover:bg-forest/30 text-forest font-medium py-2 px-3 rounded-lg transition-colors text-sm"
+                    className="bg-forest/20 hover:bg-forest/30 text-forest font-medium py-2 px-3 rounded-lg transition-colors"
+                    style={{ fontSize: '12px' }}
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-bold text-forest">{receipt.storeName}</h1>
+                  <h1 className="font-semibold text-forest flex-1" style={{ fontSize: '15px', marginBottom: '4px' }}>{receipt.storeName}</h1>
                   <button
                     onClick={handleEditStoreName}
                     className="text-forest/60 hover:text-terracotta p-1"
                     title="Edit store name"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                   </button>
                 </div>
               )}
-              <p className="text-forest/70 text-sm">
-                {formatDateTime(receipt.date)}
-              </p>
+              <div className="flex gap-3" style={{ fontSize: '13px', color: '#4A4A4A' }}>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'rgba(74, 74, 74, 0.5)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {formatDateTime(receipt.date)}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'rgba(74, 74, 74, 0.5)' }}>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
+                  {receipt.products.length} items
+                </div>
+              </div>
             </div>
 
             {hasBuyers && (
@@ -411,7 +428,7 @@ export function ReceiptDetail() {
                   onClick={() => setIsBuyersCollapsed(!isBuyersCollapsed)}
                   className="w-full flex items-center justify-between font-semibold mb-2 text-forest"
                 >
-                  <span className="text-sm">Buyers ({buyers.length})</span>
+                  <span style={{ fontSize: '13px' }}>Buyers ({buyers.length})</span>
                   <svg className={`w-4 h-4 text-forest/60 transition-transform ${isBuyersCollapsed ? '' : '-rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
@@ -428,7 +445,8 @@ export function ReceiptDetail() {
                         }}
                         onFocus={() => setShowBuyerDropdown(true)}
                         placeholder="Add buyer..."
-                        className="flex-1 border border-forest/30 p-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                        className="flex-1 border border-forest/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                        style={{ fontSize: '12px' }}
                         onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                         autoComplete="off"
                       />
@@ -448,12 +466,13 @@ export function ReceiptDetail() {
                           <div key={buyer.id} className="bg-forest/10 p-2 rounded-lg border border-forest/20 relative">
                             <button
                               onClick={() => removeBuyer(buyer.id)}
-                              className="absolute top-1 right-1 text-terracotta hover:text-terracotta/80 text-xs"
+                              className="absolute top-1 right-1 text-terracotta hover:text-terracotta/80"
+                              style={{ fontSize: '16px', lineHeight: '1' }}
                             >
                               ×
                             </button>
-                            <h3 className="font-semibold text-xs pr-4 text-forest">{buyer.name}</h3>
-                            <p className="text-sm font-bold text-terracotta">
+                            <h3 className="font-semibold pr-4 text-forest" style={{ fontSize: '12px' }}>{buyer.name}</h3>
+                            <p className="font-semibold text-terracotta" style={{ fontSize: '13px' }}>
                               {total.toFixed(2)} RSD
                             </p>
                           </div>
@@ -468,15 +487,15 @@ export function ReceiptDetail() {
         {hasBuyers ? (
           <div className="bg-beige rounded-lg overflow-hidden shadow-md">
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full" style={{ fontSize: '13px' }}>
                 <thead className="bg-forest/10">
                   <tr>
-                    <th className="px-3 py-2 text-left font-semibold text-forest text-xs">Product</th>
-                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Qty</th>
-                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Unit</th>
-                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Total</th>
+                    <th className="px-3 py-1.5 text-left font-semibold text-forest" style={{ fontSize: '11px' }}>Product</th>
+                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Qty</th>
+                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Unit</th>
+                    <th className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '11px' }}>Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-forest text-xs min-w-[100px]">
+                      <th key={buyer.id} className="px-3 py-1.5 text-center font-semibold text-forest min-w-[100px]" style={{ fontSize: '11px' }}>
                         {buyer.name}
                       </th>
                     ))}
@@ -489,16 +508,16 @@ export function ReceiptDetail() {
 
                     return (
                       <tr key={product.id}>
-                        <td className="px-3 py-2">
-                          <div className="font-medium text-forest text-xs">{product.name}</div>
+                        <td className="px-3 py-1.5">
+                          <div className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</div>
                         </td>
-                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
+                        <td className="px-3 py-1.5 text-right" style={{ color: '#4A4A4A', fontSize: '12px' }}>
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
+                        <td className="px-3 py-1.5 text-right" style={{ color: '#4A4A4A', fontSize: '12px' }}>
                           {unitPrice.toFixed(2)}
                         </td>
-                        <td className="px-3 py-2 text-right font-semibold text-forest text-xs">
+                        <td className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '12px' }}>
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
@@ -509,7 +528,7 @@ export function ReceiptDetail() {
                             : share;
 
                           return (
-                            <td key={buyer.id} className="px-3 py-2 text-center">
+                            <td key={buyer.id} className="px-3 py-1.5 text-center">
                               <input
                                 type="text"
                                 inputMode="numeric"
@@ -517,9 +536,10 @@ export function ReceiptDetail() {
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
                                 onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                                className="w-16 border border-forest/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest text-xs"
+                                className="w-16 border border-forest/30 p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
+                                style={{ fontSize: '12px' }}
                               />
-                              <div className="text-xs text-forest/60 mt-0.5">
+                              <div style={{ fontSize: '11px', color: '#4A4A4A', marginTop: '2px' }}>
                                 {(share * unitPrice).toFixed(2)}
                               </div>
                             </td>
@@ -529,18 +549,18 @@ export function ReceiptDetail() {
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-forest/10 border-t-2 border-forest/20">
+                <tfoot className="bg-forest/10 border-t border-forest/20">
                   <tr>
-                    <td className="px-3 py-2 text-right font-bold text-forest" colSpan="3">
+                    <td className="px-3 py-1.5 text-right font-semibold text-forest" colSpan="3" style={{ fontSize: '12px' }}>
                       Total:
                     </td>
-                    <td className="px-3 py-2 text-right font-bold text-forest">
+                    <td className="px-3 py-1.5 text-right font-semibold text-forest" style={{ fontSize: '12px' }}>
                       {receipt.totalAmount.toFixed(2)}
                     </td>
                     {buyers.map(buyer => {
                       const total = calculateBuyerShare(buyer.id, receipt);
                       return (
-                        <td key={buyer.id} className="px-3 py-2 text-right font-bold text-terracotta">
+                        <td key={buyer.id} className="px-3 py-1.5 text-right font-semibold text-terracotta" style={{ fontSize: '12px' }}>
                           {total.toFixed(2)}
                         </td>
                       );
@@ -553,19 +573,19 @@ export function ReceiptDetail() {
         ) : (
           <div className="bg-beige rounded-lg overflow-hidden mb-3 shadow-md">
             <div className="p-3 bg-forest/10 border-b border-forest/20">
-              <h2 className="font-semibold text-forest text-sm">Products ({receipt.products.length})</h2>
+              <h2 className="font-semibold text-forest" style={{ fontSize: '13px' }}>Products ({receipt.products.length})</h2>
             </div>
             <div className="divide-y divide-forest/10">
               {receipt.products.map((product) => (
                 <div key={product.id} className="p-3 flex justify-between items-center">
                   <div className="flex-1">
-                    <h3 className="font-medium text-forest text-sm">{product.name}</h3>
-                    <p className="text-xs text-forest/70">
+                    <h3 className="font-medium text-forest" style={{ fontSize: '13px' }}>{product.name}</h3>
+                    <p style={{ fontSize: '12px', color: '#4A4A4A' }}>
                       {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-forest">{product.total.toFixed(2)}</p>
+                    <p className="font-semibold text-forest" style={{ fontSize: '13px' }}>{product.total.toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -573,16 +593,16 @@ export function ReceiptDetail() {
           </div>
         )}
 
-            <div className="bg-beige rounded-lg p-4 shadow-md">
-              <div className="flex justify-between items-center text-sm mb-1.5">
-                <span className="text-forest/70">Subtotal:</span>
+            <div className="bg-beige rounded-lg p-3 shadow-md">
+              <div className="flex justify-between items-center mb-1.5" style={{ fontSize: '13px' }}>
+                <span style={{ color: '#4A4A4A' }}>Subtotal:</span>
                 <span className="font-semibold text-forest">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center text-sm mb-1.5">
-                <span className="text-forest/70">VAT:</span>
+              <div className="flex justify-between items-center mb-1.5" style={{ fontSize: '13px' }}>
+                <span style={{ color: '#4A4A4A' }}>VAT:</span>
                 <span className="font-semibold text-forest">{receipt.taxAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center base border-t border-forest/20 pt-1.5 mt-1.5">
+              <div className="flex justify-between items-center border-t border-forest/20 pt-1.5 mt-1.5" style={{ fontSize: '13px' }}>
                 <span className="font-bold text-forest">Total:</span>
                 <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
               </div>
@@ -591,7 +611,8 @@ export function ReceiptDetail() {
             <div>
               <button
                 onClick={() => window.open(receipt.originalUrl, '_blank')}
-                className="w-full bg-forest/10 hover:bg-forest/20 text-forest font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-forest/10 hover:bg-forest/20 text-forest font-medium py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                style={{ fontSize: '13px' }}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -604,7 +625,7 @@ export function ReceiptDetail() {
           {hasBuyers && (
             <div className="hidden lg:block lg:col-span-1">
               <div className="bg-beige rounded-lg p-3 sticky top-4 shadow-md">
-                <h3 className="font-semibold mb-2 text-forest text-sm">Buyers</h3>
+                <h3 className="font-semibold mb-2 text-forest" style={{ fontSize: '13px' }}>Buyers</h3>
 
                 <div className="mb-3">
                   <div className="flex gap-2 mb-2">
@@ -617,13 +638,14 @@ export function ReceiptDetail() {
                       }}
                       onFocus={() => setShowBuyerDropdown(true)}
                       placeholder="Add buyer..."
-                      className="flex-1 border border-forest/30 p-2 rounded text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                      className="flex-1 border border-forest/30 p-2 rounded focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
+                      style={{ fontSize: '12px' }}
                       onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                       autoComplete="off"
                     />
                     <button
                       onClick={addBuyer}
-                      className="bg-terracotta hover:bg-terracotta/90 text-white px-3 py-2 rounded text-xs"
+                      className="bg-terracotta hover:bg-terracotta/90 text-white px-3 py-2 rounded"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -639,7 +661,8 @@ export function ReceiptDetail() {
                             <div
                               key={buyer.id}
                               onClick={() => selectBuyer(buyer)}
-                              className="p-2 hover:bg-forest/10 cursor-pointer border-b border-forest/10 last:border-b-0 text-xs"
+                              className="p-2 hover:bg-forest/10 cursor-pointer border-b border-forest/10 last:border-b-0"
+                              style={{ fontSize: '12px' }}
                             >
                               <div className="font-medium text-forest">{buyer.name}</div>
                             </div>
@@ -653,15 +676,16 @@ export function ReceiptDetail() {
                   {buyers.map((buyer) => {
                     const total = calculateBuyerShare(buyer.id, receipt);
                     return (
-                      <div key={buyer.id} className="bg-forest/10 p-3 rounded-lg border border-forest/20 relative group">
+                      <div key={buyer.id} className="bg-forest/10 p-2.5 rounded-lg border border-forest/20 relative group">
                         <button
                           onClick={() => removeBuyer(buyer.id)}
-                          className="absolute top-2 right-2 text-terracotta hover:text-terracotta/80 text-xs opacity-0 group-hover:opacity-100"
+                          className="absolute top-2 right-2 text-terracotta hover:text-terracotta/80 opacity-0 group-hover:opacity-100"
+                          style={{ fontSize: '16px', lineHeight: '1' }}
                         >
                           ×
                         </button>
-                        <h3 className="font-semibold text-xs pr-4 text-forest">{buyer.name}</h3>
-                        <p className="text-base font-bold text-terracotta">
+                        <h3 className="font-semibold pr-4 text-forest" style={{ fontSize: '12px' }}>{buyer.name}</h3>
+                        <p className="font-semibold text-terracotta" style={{ fontSize: '14px' }}>
                           {total.toFixed(2)}
                         </p>
                       </div>
