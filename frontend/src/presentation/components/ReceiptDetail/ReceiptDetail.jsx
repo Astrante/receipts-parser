@@ -292,10 +292,10 @@ export function ReceiptDetail() {
 
   if (!receipt) {
     return (
-      <div className="min-h-screen bg-beige p-4">
+      <div className="min-h-screen bg-forest p-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-forest rounded-lg p-6 text-center">
-            <p className="text-beige/80">Receipt not found</p>
+          <div className="bg-beige rounded-lg p-6 text-center shadow-xl">
+            <p className="text-forest/70">Receipt not found</p>
             <button
               onClick={() => navigate('/')}
               className="mt-3 text-terracotta hover:text-terracotta/80 font-medium"
@@ -318,13 +318,13 @@ export function ReceiptDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-beige p-3">
+    <div className="min-h-screen bg-forest p-3">
       <div className="max-w-7xl mx-auto">
         <div className="mb-3 flex justify-between items-start">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
-              className="text-slate hover:text-forest flex items-center gap-1 text-sm font-medium"
+              className="text-beige/70 hover:text-beige flex items-center gap-1 text-sm font-medium"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -345,7 +345,7 @@ export function ReceiptDetail() {
             {hasBuyers && (
               <button
                 onClick={() => navigate(`/receipt/${receipt.id}/split`)}
-                className="bg-forest hover:bg-forest/90 text-white text-xs font-medium py-2 px-3 rounded-lg transition-colors"
+                className="bg-forest hover:bg-forest/90 text-beige text-xs font-medium py-2 px-3 rounded-lg transition-colors"
               >
                 Edit Split
               </button>
@@ -353,7 +353,7 @@ export function ReceiptDetail() {
           </div>
           <button
             onClick={handleDelete}
-            className="text-slate/60 hover:text-terracotta text-2xl font-bold leading-none p-1"
+            className="text-beige/60 hover:text-terracotta text-2xl font-bold leading-none p-1"
             title="Delete receipt"
           >
             ×
@@ -362,7 +362,7 @@ export function ReceiptDetail() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <div className="lg:col-span-3 space-y-3">
-            <div className="bg-forest rounded-lg p-4">
+            <div className="bg-beige rounded-lg p-4 shadow-md">
               {isEditingStore ? (
                 <div className="flex items-center gap-2">
                   <input
@@ -370,7 +370,7 @@ export function ReceiptDetail() {
                     value={editedStoreName}
                     onChange={(e) => setEditedStoreName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveStoreName()}
-                    className="flex-1 text-xl font-bold border border-beige/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige"
+                    className="flex-1 text-xl font-bold border border-forest/30 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest"
                     autoFocus
                   />
                   <button
@@ -381,17 +381,17 @@ export function ReceiptDetail() {
                   </button>
                   <button
                     onClick={handleCancelStoreName}
-                    className="bg-slate/50 hover:bg-slate/70 text-beige font-medium py-2 px-3 rounded-lg transition-colors text-sm"
+                    className="bg-forest/20 hover:bg-forest/30 text-forest font-medium py-2 px-3 rounded-lg transition-colors text-sm"
                   >
                     Cancel
                   </button>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
-                  <h1 className="text-xl font-bold text-beige">{receipt.storeName}</h1>
+                  <h1 className="text-xl font-bold text-forest">{receipt.storeName}</h1>
                   <button
                     onClick={handleEditStoreName}
-                    className="text-beige/60 hover:text-terracotta p-1"
+                    className="text-forest/60 hover:text-terracotta p-1"
                     title="Edit store name"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,19 +400,19 @@ export function ReceiptDetail() {
                   </button>
                 </div>
               )}
-              <p className="text-beige/70 text-sm">
+              <p className="text-forest/70 text-sm">
                 {formatDateTime(receipt.date)}
               </p>
             </div>
 
             {hasBuyers && (
-              <div className="lg:hidden bg-forest rounded-lg p-3">
+              <div className="lg:hidden bg-beige rounded-lg p-3 shadow-md">
                 <button
                   onClick={() => setIsBuyersCollapsed(!isBuyersCollapsed)}
-                  className="w-full flex items-center justify-between font-semibold mb-2 text-beige"
+                  className="w-full flex items-center justify-between font-semibold mb-2 text-forest"
                 >
                   <span className="text-sm">Buyers ({buyers.length})</span>
-                  <svg className={`w-4 h-4 text-beige/60 transition-transform ${isBuyersCollapsed ? '' : '-rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-4 h-4 text-forest/60 transition-transform ${isBuyersCollapsed ? '' : '-rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
@@ -428,7 +428,7 @@ export function ReceiptDetail() {
                         }}
                         onFocus={() => setShowBuyerDropdown(true)}
                         placeholder="Add buyer..."
-                        className="flex-1 border border-beige/30 p-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50"
+                        className="flex-1 border border-forest/30 p-2 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
                         onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                         autoComplete="off"
                       />
@@ -445,14 +445,14 @@ export function ReceiptDetail() {
                       {buyers.map((buyer) => {
                         const total = calculateBuyerShare(buyer.id, receipt);
                         return (
-                          <div key={buyer.id} className="bg-beige/10 p-2 rounded-lg border border-beige/20 relative">
+                          <div key={buyer.id} className="bg-forest/10 p-2 rounded-lg border border-forest/20 relative">
                             <button
                               onClick={() => removeBuyer(buyer.id)}
                               className="absolute top-1 right-1 text-terracotta hover:text-terracotta/80 text-xs"
                             >
                               ×
                             </button>
-                            <h3 className="font-semibold text-xs pr-4 text-beige">{buyer.name}</h3>
+                            <h3 className="font-semibold text-xs pr-4 text-forest">{buyer.name}</h3>
                             <p className="text-sm font-bold text-terracotta">
                               {total.toFixed(2)} RSD
                             </p>
@@ -466,23 +466,23 @@ export function ReceiptDetail() {
             )}
 
         {hasBuyers ? (
-          <div className="bg-forest rounded-lg overflow-hidden">
+          <div className="bg-beige rounded-lg overflow-hidden shadow-md">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-beige/10">
+                <thead className="bg-forest/10">
                   <tr>
-                    <th className="px-3 py-2 text-left font-semibold text-beige text-xs">Product</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Qty</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Unit</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Total</th>
+                    <th className="px-3 py-2 text-left font-semibold text-forest text-xs">Product</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Qty</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Unit</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-beige text-xs min-w-[100px]">
+                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-forest text-xs min-w-[100px]">
                         {buyer.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-beige/10">
+                <tbody className="divide-y divide-forest/10">
                   {receipt.products.map(product => {
                     const unitPrice = product.total / product.quantity;
                     const currentDist = product.distribution || {};
@@ -490,15 +490,15 @@ export function ReceiptDetail() {
                     return (
                       <tr key={product.id}>
                         <td className="px-3 py-2">
-                          <div className="font-medium text-beige text-xs">{product.name}</div>
+                          <div className="font-medium text-forest text-xs">{product.name}</div>
                         </td>
-                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
+                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
+                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
                           {unitPrice.toFixed(2)}
                         </td>
-                        <td className="px-3 py-2 text-right font-semibold text-beige text-xs">
+                        <td className="px-3 py-2 text-right font-semibold text-forest text-xs">
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
@@ -517,9 +517,9 @@ export function ReceiptDetail() {
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
                                 onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                                className="w-16 border border-beige/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige text-xs"
+                                className="w-16 border border-forest/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest text-xs"
                               />
-                              <div className="text-xs text-beige/60 mt-0.5">
+                              <div className="text-xs text-forest/60 mt-0.5">
                                 {(share * unitPrice).toFixed(2)}
                               </div>
                             </td>
@@ -529,12 +529,12 @@ export function ReceiptDetail() {
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-beige/10 border-t-2 border-beige/20">
+                <tfoot className="bg-forest/10 border-t-2 border-forest/20">
                   <tr>
-                    <td className="px-3 py-2 text-right font-bold text-beige" colSpan="3">
+                    <td className="px-3 py-2 text-right font-bold text-forest" colSpan="3">
                       Total:
                     </td>
-                    <td className="px-3 py-2 text-right font-bold text-beige">
+                    <td className="px-3 py-2 text-right font-bold text-forest">
                       {receipt.totalAmount.toFixed(2)}
                     </td>
                     {buyers.map(buyer => {
@@ -551,21 +551,21 @@ export function ReceiptDetail() {
             </div>
           </div>
         ) : (
-          <div className="bg-forest rounded-lg overflow-hidden mb-3">
-            <div className="p-3 bg-beige/10 border-b border-beige/20">
-              <h2 className="font-semibold text-beige text-sm">Products ({receipt.products.length})</h2>
+          <div className="bg-beige rounded-lg overflow-hidden mb-3 shadow-md">
+            <div className="p-3 bg-forest/10 border-b border-forest/20">
+              <h2 className="font-semibold text-forest text-sm">Products ({receipt.products.length})</h2>
             </div>
-            <div className="divide-y divide-beige/10">
+            <div className="divide-y divide-forest/10">
               {receipt.products.map((product) => (
                 <div key={product.id} className="p-3 flex justify-between items-center">
                   <div className="flex-1">
-                    <h3 className="font-medium text-beige text-sm">{product.name}</h3>
-                    <p className="text-xs text-beige/70">
+                    <h3 className="font-medium text-forest text-sm">{product.name}</h3>
+                    <p className="text-xs text-forest/70">
                       {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold text-beige">{product.total.toFixed(2)}</p>
+                    <p className="font-bold text-forest">{product.total.toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -573,17 +573,17 @@ export function ReceiptDetail() {
           </div>
         )}
 
-            <div className="bg-forest rounded-lg p-4">
+            <div className="bg-beige rounded-lg p-4 shadow-md">
               <div className="flex justify-between items-center text-sm mb-1.5">
-                <span className="text-beige/70">Subtotal:</span>
-                <span className="font-semibold text-beige">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)}</span>
+                <span className="text-forest/70">Subtotal:</span>
+                <span className="font-semibold text-forest">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)}</span>
               </div>
               <div className="flex justify-between items-center text-sm mb-1.5">
-                <span className="text-beige/70">VAT:</span>
-                <span className="font-semibold text-beige">{receipt.taxAmount.toFixed(2)}</span>
+                <span className="text-forest/70">VAT:</span>
+                <span className="font-semibold text-forest">{receipt.taxAmount.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between items-center base border-t border-beige/20 pt-1.5 mt-1.5">
-                <span className="font-bold text-beige">Total:</span>
+              <div className="flex justify-between items-center base border-t border-forest/20 pt-1.5 mt-1.5">
+                <span className="font-bold text-forest">Total:</span>
                 <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
               </div>
             </div>
@@ -591,7 +591,7 @@ export function ReceiptDetail() {
             <div>
               <button
                 onClick={() => window.open(receipt.originalUrl, '_blank')}
-                className="w-full bg-beige/20 hover:bg-beige/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
+                className="w-full bg-forest/10 hover:bg-forest/20 text-forest font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 text-sm"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -603,8 +603,8 @@ export function ReceiptDetail() {
 
           {hasBuyers && (
             <div className="hidden lg:block lg:col-span-1">
-              <div className="bg-forest rounded-lg p-3 sticky top-4">
-                <h3 className="font-semibold mb-2 text-beige text-sm">Buyers</h3>
+              <div className="bg-beige rounded-lg p-3 sticky top-4 shadow-md">
+                <h3 className="font-semibold mb-2 text-forest text-sm">Buyers</h3>
 
                 <div className="mb-3">
                   <div className="flex gap-2 mb-2">
@@ -617,7 +617,7 @@ export function ReceiptDetail() {
                       }}
                       onFocus={() => setShowBuyerDropdown(true)}
                       placeholder="Add buyer..."
-                      className="flex-1 border border-beige/30 p-2 rounded text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50"
+                      className="flex-1 border border-forest/30 p-2 rounded text-xs focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
                       onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                       autoComplete="off"
                     />
@@ -632,16 +632,16 @@ export function ReceiptDetail() {
                   </div>
                   {showBuyerDropdown && savedBuyers.length > 0 && (
                     <div className="relative">
-                      <div className="absolute z-10 w-full mt-1 bg-forest border border-beige/30 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-beige border border-forest/30 rounded-lg shadow-lg max-h-40 overflow-y-auto">
                         {savedBuyers
                           .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
                           .map(buyer => (
                             <div
                               key={buyer.id}
                               onClick={() => selectBuyer(buyer)}
-                              className="p-2 hover:bg-beige/10 cursor-pointer border-b border-beige/10 last:border-b-0 text-xs"
+                              className="p-2 hover:bg-forest/10 cursor-pointer border-b border-forest/10 last:border-b-0 text-xs"
                             >
-                              <div className="font-medium text-beige">{buyer.name}</div>
+                              <div className="font-medium text-forest">{buyer.name}</div>
                             </div>
                           ))}
                       </div>
@@ -653,14 +653,14 @@ export function ReceiptDetail() {
                   {buyers.map((buyer) => {
                     const total = calculateBuyerShare(buyer.id, receipt);
                     return (
-                      <div key={buyer.id} className="bg-beige/10 p-3 rounded-lg border border-beige/20 relative group">
+                      <div key={buyer.id} className="bg-forest/10 p-3 rounded-lg border border-forest/20 relative group">
                         <button
                           onClick={() => removeBuyer(buyer.id)}
                           className="absolute top-2 right-2 text-terracotta hover:text-terracotta/80 text-xs opacity-0 group-hover:opacity-100"
                         >
                           ×
                         </button>
-                        <h3 className="font-semibold text-xs pr-4 text-beige">{buyer.name}</h3>
+                        <h3 className="font-semibold text-xs pr-4 text-forest">{buyer.name}</h3>
                         <p className="text-base font-bold text-terracotta">
                           {total.toFixed(2)}
                         </p>

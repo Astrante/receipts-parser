@@ -65,7 +65,7 @@ export function ReceiptList() {
   };
 
   const dropdownTrigger = (
-    <button className="bg-forest hover:bg-forest/90 text-beige font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+    <button className="bg-beige hover:bg-beige/90 text-forest font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2 shadow-lg">
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
       </svg>
@@ -108,19 +108,19 @@ export function ReceiptList() {
   ];
 
   return (
-    <div className="min-h-screen bg-beige p-3">
+    <div className="min-h-screen bg-forest p-3">
       <div className="max-w-2xl mx-auto">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold text-slate">My Receipts</h1>
+          <h1 className="text-2xl font-bold text-beige">My Receipts</h1>
           <DropdownMenu trigger={dropdownTrigger} items={dropdownItems} />
         </div>
 
         {sortedReceipts.length === 0 ? (
-          <div className="bg-forest rounded-lg p-8 text-center">
-            <svg className="mx-auto h-16 w-16 text-beige/60 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-beige rounded-lg p-8 text-center shadow-lg">
+            <svg className="mx-auto h-16 w-16 text-forest/60 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-beige/80 mb-4">No receipts yet</p>
+            <p className="text-forest/70 mb-4">No receipts yet</p>
             <button
               onClick={() => setScanSheetOpen(true)}
               className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
@@ -137,15 +137,15 @@ export function ReceiptList() {
                 <div
                   key={receipt.id}
                   onClick={() => navigate(`/receipt/${receipt.id}`)}
-                  className="bg-forest rounded-lg hover:shadow-md transition-shadow cursor-pointer group"
+                  className="bg-beige rounded-lg hover:shadow-xl transition-all cursor-pointer group shadow-md"
                 >
                   <div className="p-3">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-beige flex-1">{receipt.storeName}</h3>
+                      <h3 className="font-semibold text-forest flex-1">{receipt.storeName}</h3>
                       <div className="flex gap-1">
                         <button
                           onClick={(e) => handleExport(receipt, e)}
-                          className="text-beige/60 hover:text-terracotta hover:bg-beige/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
                           title="Download JSON"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,7 +154,7 @@ export function ReceiptList() {
                         </button>
                         <button
                           onClick={(e) => handleDelete(receipt.id, e)}
-                          className="text-beige/60 hover:text-terracotta hover:bg-beige/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
                           title="Delete receipt"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,14 +166,14 @@ export function ReceiptList() {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <div className="flex items-center text-xs text-beige/80">
-                          <svg className="w-3.5 h-3.5 mr-1.5 text-beige/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex items-center text-xs text-forest/70">
+                          <svg className="w-3.5 h-3.5 mr-1.5 text-forest/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           {formatDateTime(receipt.date)}
                         </div>
-                        <div className="flex items-center text-xs text-beige/80">
-                          <svg className="w-3.5 h-3.5 mr-1.5 text-beige/60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <div className="flex items-center text-xs text-forest/70">
+                          <svg className="w-3.5 h-3.5 mr-1.5 text-forest/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                           </svg>
                           {receipt.products.length}
@@ -185,13 +185,13 @@ export function ReceiptList() {
                           <div className="space-y-0.5">
                             {buyersBreakdown.map((buyer, idx) => (
                               <div key={idx} className="text-xs">
-                                <span className="text-beige/80">{buyer.name}:</span>{' '}
-                                <span className="font-semibold text-beige">{buyer.share.toFixed(2)} RSD</span>
+                                <span className="text-forest/70">{buyer.name}:</span>{' '}
+                                <span className="font-semibold text-forest">{buyer.share.toFixed(2)} RSD</span>
                               </div>
                             ))}
                           </div>
                         ) : (
-                          <div className="font-bold text-lg text-beige">
+                          <div className="font-bold text-lg text-forest">
                             {receipt.totalAmount.toFixed(2)} RSD
                           </div>
                         )}

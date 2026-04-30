@@ -263,10 +263,10 @@ export function SplitReceipt() {
 
   if (!receipt) {
     return (
-      <div className="min-h-screen bg-beige p-4">
+      <div className="min-h-screen bg-forest p-4">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-forest rounded-lg p-6 text-center">
-            <p className="text-beige/80">Receipt not found</p>
+          <div className="bg-beige rounded-lg p-6 text-center shadow-xl">
+            <p className="text-forest/70">Receipt not found</p>
             <button
               onClick={() => navigate('/')}
               className="mt-3 text-terracotta hover:text-terracotta/80 font-medium"
@@ -283,13 +283,13 @@ export function SplitReceipt() {
   const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
 
   return (
-    <div className="min-h-screen bg-beige p-3">
+    <div className="min-h-screen bg-forest p-3">
       <div className="max-w-6xl mx-auto">
         <div className="mb-3 flex justify-between items-start">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate(`/receipt/${receipt.id}`)}
-              className="text-slate hover:text-forest flex items-center gap-1 text-sm font-medium"
+              className="text-beige/70 hover:text-beige flex items-center gap-1 text-sm font-medium"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -299,10 +299,10 @@ export function SplitReceipt() {
           </div>
         </div>
 
-        <h1 className="text-2xl font-bold mb-4 text-slate">Split Receipt</h1>
+        <h1 className="text-2xl font-bold mb-4 text-beige">Split Receipt</h1>
 
-        <div className="bg-forest rounded-lg p-4 mb-4">
-          <h2 className="text-base font-semibold mb-3 text-beige">Buyers</h2>
+        <div className="bg-beige rounded-lg p-4 mb-4 shadow-md">
+          <h2 className="text-base font-semibold mb-3 text-forest">Buyers</h2>
           <div className="relative">
             <div className="flex gap-2 mb-3">
               <div className="flex-1 relative">
@@ -315,21 +315,21 @@ export function SplitReceipt() {
                   }}
                   onFocus={() => setShowBuyerDropdown(true)}
                   placeholder="Buyer name or select from list"
-                  className="w-full border border-beige/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50 text-sm"
+                  className="w-full border border-forest/30 p-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-sm"
                   onKeyDown={(e) => e.key === 'Enter' && addBuyer()}
                   autoComplete="off"
                 />
                 {showBuyerDropdown && savedBuyers.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-forest border border-beige/30 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-beige border border-forest/30 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {savedBuyers
                       .filter(b => b.name.toLowerCase().includes(newBuyerName.toLowerCase()))
                       .map(buyer => (
                         <div
                           key={buyer.id}
                           onClick={() => selectBuyer(buyer)}
-                          className="p-2 hover:bg-beige/10 cursor-pointer border-b border-beige/10 last:border-b-0"
+                          className="p-2 hover:bg-forest/10 cursor-pointer border-b border-forest/10 last:border-b-0"
                         >
-                          <div className="font-medium text-beige text-sm">{buyer.name}</div>
+                          <div className="font-medium text-forest text-sm">{buyer.name}</div>
                         </div>
                       ))}
                   </div>
@@ -337,7 +337,7 @@ export function SplitReceipt() {
               </div>
               <button
                 onClick={addBuyer}
-                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-1 text-sm"
+                className="bg-forest hover:bg-forest/90 text-beige font-medium px-4 py-2 rounded-lg transition-colors flex items-center gap-1 text-sm"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -348,7 +348,7 @@ export function SplitReceipt() {
           </div>
 
           {buyers.length === 0 ? (
-            <p className="text-beige/60 text-center py-3 text-sm">
+            <p className="text-forest/60 text-center py-3 text-sm">
               Add a buyer to start splitting the receipt
             </p>
           ) : (
@@ -356,9 +356,9 @@ export function SplitReceipt() {
               {buyers.map((buyer) => {
                 const total = calculateBuyerShare(buyer.id, receipt);
                 return (
-                  <div key={buyer.id} className="bg-beige/10 p-3 rounded-lg border border-beige/20">
+                  <div key={buyer.id} className="bg-forest/10 p-3 rounded-lg border border-forest/20">
                     <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-semibold text-beige text-sm">
+                      <h3 className="font-semibold text-forest text-sm">
                         {buyer.name}
                       </h3>
                       <button
@@ -379,23 +379,23 @@ export function SplitReceipt() {
         </div>
 
         {buyers.length > 0 && (
-          <div className="bg-forest rounded-lg overflow-hidden">
+          <div className="bg-beige rounded-lg overflow-hidden shadow-md">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-beige/10">
+                <thead className="bg-forest/10">
                   <tr>
-                    <th className="px-3 py-2 text-left font-semibold text-beige text-xs">Product</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Qty</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Unit</th>
-                    <th className="px-3 py-2 text-right font-semibold text-beige text-xs">Total</th>
+                    <th className="px-3 py-2 text-left font-semibold text-forest text-xs">Product</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Qty</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Unit</th>
+                    <th className="px-3 py-2 text-right font-semibold text-forest text-xs">Total</th>
                     {buyers.map(buyer => (
-                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-beige text-xs min-w-[100px]">
+                      <th key={buyer.id} className="px-3 py-2 text-center font-semibold text-forest text-xs min-w-[100px]">
                         {buyer.name}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-beige/10">
+                <tbody className="divide-y divide-forest/10">
                   {receipt.products.map(product => {
                     const unitPrice = product.total / product.quantity;
                     const currentDist = product.distribution || {};
@@ -403,15 +403,15 @@ export function SplitReceipt() {
                     return (
                       <tr key={product.id}>
                         <td className="px-3 py-2">
-                          <div className="font-medium text-beige text-xs">{product.name}</div>
+                          <div className="font-medium text-forest text-xs">{product.name}</div>
                         </td>
-                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
+                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
                           {product.quantity} {product.unit}
                         </td>
-                        <td className="px-3 py-2 text-right text-beige/80 text-xs">
+                        <td className="px-3 py-2 text-right text-forest/80 text-xs">
                           {unitPrice.toFixed(2)}
                         </td>
-                        <td className="px-3 py-2 text-right font-semibold text-beige text-xs">
+                        <td className="px-3 py-2 text-right font-semibold text-forest text-xs">
                           {product.total.toFixed(2)}
                         </td>
                         {buyers.map(buyer => {
@@ -434,9 +434,9 @@ export function SplitReceipt() {
                                   buyer.id,
                                   e.target.value
                                 )}
-                                className="w-16 border border-beige/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige text-xs"
+                                className="w-16 border border-forest/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest text-xs"
                               />
-                              <div className="text-xs text-beige/60 mt-0.5">
+                              <div className="text-xs text-forest/60 mt-0.5">
                                 {(share * unitPrice).toFixed(2)}
                               </div>
                             </td>
@@ -446,12 +446,12 @@ export function SplitReceipt() {
                     );
                   })}
                 </tbody>
-                <tfoot className="bg-beige/10 border-t-2 border-beige/20">
+                <tfoot className="bg-forest/10 border-t-2 border-forest/20">
                   <tr>
-                    <td className="px-3 py-2 text-right font-bold text-beige" colSpan="3">
+                    <td className="px-3 py-2 text-right font-bold text-forest" colSpan="3">
                       Total:
                     </td>
-                    <td className="px-3 py-2 text-right font-bold text-beige">
+                    <td className="px-3 py-2 text-right font-bold text-forest">
                       {receipt.totalAmount.toFixed(2)}
                     </td>
                     {buyers.map(buyer => {

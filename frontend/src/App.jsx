@@ -16,8 +16,8 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-beige">
-        <nav className="bg-forest shadow-sm">
+      <div className="min-h-screen bg-forest">
+        <nav className="bg-forest/90 border-b border-beige/20">
           <div className="max-w-4xl mx-auto px-4 py-3">
             <h1 className="text-lg font-bold text-beige">Receipt Parser</h1>
           </div>

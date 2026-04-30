@@ -49,7 +49,7 @@ export function ImportBottomSheet({ isOpen, onClose }) {
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose}>
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate">Import Receipt</h2>
+        <h2 className="text-lg font-semibold text-forest">Import Receipt</h2>
 
         {isParsing && (
           <div className="p-3 bg-forest/10 rounded-lg">
@@ -74,7 +74,7 @@ export function ImportBottomSheet({ isOpen, onClose }) {
         <button
           onClick={handleImportClick}
           disabled={isParsing}
-          className="w-full bg-forest hover:bg-forest/80 disabled:bg-slate/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+          className="w-full bg-forest hover:bg-forest/90 disabled:bg-forest/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -82,8 +82,8 @@ export function ImportBottomSheet({ isOpen, onClose }) {
           Choose JSON File
         </button>
 
-        <div className="p-3 bg-slate/5 rounded-lg border border-slate/20">
-          <p className="text-xs text-slate leading-relaxed">
+        <div className="p-3 bg-forest/5 rounded-lg border border-forest/20">
+          <p className="text-xs text-forest/70 leading-relaxed">
             Select a JSON file previously exported from the app to import a receipt.
           </p>
         </div>

@@ -92,7 +92,7 @@ export function ScanBottomSheet({ isOpen, onClose }) {
   return (
     <BottomSheet isOpen={isOpen} onClose={onClose}>
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate">Scan Receipt</h2>
+        <h2 className="text-lg font-semibold text-forest">Scan Receipt</h2>
 
         {isParsing && (
           <div className="p-3 bg-forest/10 rounded-lg">
@@ -107,13 +107,13 @@ export function ScanBottomSheet({ isOpen, onClose }) {
         )}
 
         <div>
-          <label className="block text-xs font-medium text-slate mb-1">Store name (optional)</label>
+          <label className="block text-xs font-medium text-forest/70 mb-1">Store name (optional)</label>
           <input
             type="text"
             value={storeName}
             onChange={(e) => setStoreName(e.target.value)}
             placeholder="Maxi, Idea, Shop..."
-            className="w-full border border-slate/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-forest bg-white"
+            className="w-full border border-forest/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
             disabled={isParsing}
           />
         </div>
@@ -124,7 +124,7 @@ export function ScanBottomSheet({ isOpen, onClose }) {
           <button
             onClick={handleStartScan}
             disabled={isParsing}
-            className="w-full bg-forest hover:bg-forest/80 disabled:bg-slate/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-forest hover:bg-forest/90 disabled:bg-forest/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -136,7 +136,7 @@ export function ScanBottomSheet({ isOpen, onClose }) {
           <button
             onClick={handleStopScan}
             disabled={isParsing}
-            className="w-full bg-terracotta hover:bg-terracotta/80 disabled:bg-slate/30 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+            className="w-full bg-terracotta hover:bg-terracotta/80 disabled:bg-forest/30 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

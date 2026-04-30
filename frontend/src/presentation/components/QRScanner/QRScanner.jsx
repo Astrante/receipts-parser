@@ -147,25 +147,25 @@ export function QRScanner() {
   };
 
   return (
-    <div className="min-h-screen bg-beige p-3">
+    <div className="min-h-screen bg-forest p-3">
       <div className="max-w-md mx-auto">
-        <div className="bg-forest rounded-lg p-4">
-          <h1 className="text-xl font-bold mb-3 text-center text-beige">Scan QR Code</h1>
+        <div className="bg-beige rounded-lg p-4 shadow-xl">
+          <h1 className="text-xl font-bold mb-3 text-center text-forest">Scan QR Code</h1>
 
           {(isParsing || isLoading) && (
-            <div className="mb-4 p-3 bg-beige/10 rounded-lg">
+            <div className="mb-4 p-3 bg-forest/10 rounded-lg">
               <div className="flex items-center justify-center mb-2">
-                <svg className="animate-spin h-5 w-5 text-beige mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-5 w-5 text-forest mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                <span className="text-beige font-medium text-sm">Processing...</span>
+                <span className="text-forest font-medium text-sm">Processing...</span>
               </div>
             </div>
           )}
 
           <div className="mb-3">
-            <label className="block text-xs font-medium text-beige/80 mb-1">
+            <label className="block text-xs font-medium text-forest/70 mb-1">
               Store name (optional)
             </label>
             <input
@@ -173,7 +173,7 @@ export function QRScanner() {
               value={storeName}
               onChange={(e) => setStoreName(e.target.value)}
               placeholder="Maxi, Idea, Shop..."
-              className="w-full border border-beige/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50"
+              className="w-full border border-forest/30 p-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
               disabled={isParsing || isLoading}
             />
           </div>
@@ -184,7 +184,7 @@ export function QRScanner() {
             <button
               onClick={handleStartScan}
               disabled={isParsing || isLoading}
-              className="w-full bg-terracotta hover:bg-terracotta/90 disabled:bg-slate/30 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-4"
+              className="w-full bg-forest hover:bg-forest/90 disabled:bg-forest/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-4"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
@@ -196,7 +196,7 @@ export function QRScanner() {
             <button
               onClick={handleStopScan}
               disabled={isParsing || isLoading}
-              className="w-full bg-slate hover:bg-slate/80 disabled:bg-slate/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-4"
+              className="w-full bg-terracotta hover:bg-terracotta/80 disabled:bg-forest/30 text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 mb-4"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -206,9 +206,9 @@ export function QRScanner() {
           )}
 
           <div className="flex items-center my-4">
-            <div className="flex-1 border-t border-beige/30"></div>
-            <span className="px-3 text-beige/60 text-xs">OR</span>
-            <div className="flex-1 border-t border-beige/30"></div>
+            <div className="flex-1 border-t border-forest/20"></div>
+            <span className="px-3 text-forest/60 text-xs">OR</span>
+            <div className="flex-1 border-t border-forest/20"></div>
           </div>
 
           <div className="mb-3">
@@ -222,7 +222,7 @@ export function QRScanner() {
             <button
               onClick={handleImportClick}
               disabled={isParsing || isLoading}
-              className="w-full bg-beige/20 hover:bg-beige/30 disabled:bg-slate/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-forest/10 hover:bg-forest/20 disabled:bg-forest/30 text-forest font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
@@ -238,14 +238,14 @@ export function QRScanner() {
                 value={manualUrl}
                 onChange={(e) => setManualUrl(e.target.value)}
                 placeholder="https://suf.purs.gov.rs/v/..."
-                className="w-full border border-beige/30 p-2 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-beige/10 text-beige placeholder-beige/50 text-sm"
+                className="w-full border border-forest/30 p-2 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-terracotta bg-white"
                 disabled={isParsing || isLoading}
                 required
               />
               <button
                 type="submit"
                 disabled={isParsing || isLoading}
-                className="w-full bg-beige/20 hover:bg-beige/30 disabled:bg-slate/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-forest/10 hover:bg-forest/20 disabled:bg-forest/30 text-forest font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
