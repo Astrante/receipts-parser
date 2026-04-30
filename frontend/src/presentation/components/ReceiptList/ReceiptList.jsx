@@ -112,59 +112,29 @@ export function ReceiptList() {
         </div>
 
         {sortedReceipts.length === 0 ? (
-          <div className="space-y-3">
-            <div className="bg-beige rounded-lg p-8 text-center shadow-lg mb-4">
-              <svg className="mx-auto h-16 w-16 text-forest/60 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p className="text-forest/70">No receipts yet</p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-3">
+          <div className="bg-beige rounded-lg p-8 text-center shadow-lg">
+            <svg className="mx-auto h-16 w-16 text-forest/60 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <p className="text-forest/70 mb-4">No receipts yet</p>
+            <div className="flex flex-col gap-2 items-center">
               <button
                 onClick={() => setScanSheetOpen(true)}
-                className="bg-beige rounded-lg p-4 shadow-md hover:shadow-xl transition-all flex items-center gap-3 text-left group"
+                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                <div className="bg-forest/10 p-2.5 rounded-lg group-hover:bg-forest/20 transition-colors">
-                  <svg className="w-5 h-5 text-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-forest">Scan</div>
-                  <div className="text-xs text-forest/70">Scan a receipt with your camera</div>
-                </div>
+                Scan
               </button>
-
               <button
                 onClick={() => setLinkSheetOpen(true)}
-                className="bg-beige rounded-lg p-4 shadow-md hover:shadow-xl transition-all flex items-center gap-3 text-left group"
+                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                <div className="bg-forest/10 p-2.5 rounded-lg group-hover:bg-forest/20 transition-colors">
-                  <svg className="w-5 h-5 text-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-forest">Add by link</div>
-                  <div className="text-xs text-forest/70">Add a receipt from a link</div>
-                </div>
+                Add by link
               </button>
-
               <button
                 onClick={() => setImportSheetOpen(true)}
-                className="bg-beige rounded-lg p-4 shadow-md hover:shadow-xl transition-all flex items-center gap-3 text-left group"
+                className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-4 rounded-lg transition-colors"
               >
-                <div className="bg-forest/10 p-2.5 rounded-lg group-hover:bg-forest/20 transition-colors">
-                  <svg className="w-5 h-5 text-forest" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-forest">Import</div>
-                  <div className="text-xs text-forest/70">Import from a file</div>
-                </div>
+                Import
               </button>
             </div>
           </div>
