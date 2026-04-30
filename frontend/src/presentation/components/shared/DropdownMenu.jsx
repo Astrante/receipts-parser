@@ -27,7 +27,7 @@ export function DropdownMenu({ trigger, items }) {
       </div>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-2xl border border-white/60 py-1 z-50" style={{ backgroundColor: 'rgba(255, 255, 255, 0.65)', backdropFilter: 'blur(20px)' }}>
+        <div className="absolute right-0 mt-2 w-48 rounded-lg shadow-2xl border border-white/60 py-1 z-50" style={{ backgroundColor: 'rgba(255, 255, 255, 0.65)', backdropFilter: 'blur(8px)' }}>
           {items.map((item, index) => (
             <button
               key={index}
