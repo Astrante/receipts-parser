@@ -104,14 +104,18 @@ export function ReceiptList() {
                           className="text-gray-400 hover:text-blue-500 hover:bg-blue-50 text-base leading-none p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                           title="Скачать JSON"
                         >
-                          ⬇️
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                          </svg>
                         </button>
                         <button
                           onClick={(e) => handleDelete(receipt.id, e)}
                           className="text-gray-400 hover:text-red-500 hover:bg-red-50 text-base leading-none p-2 rounded-lg transition-all opacity-0 group-hover:opacity-100"
                           title="Удалить чек"
                         >
-                          ✕
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
                         </button>
                       </div>
                     </div>
