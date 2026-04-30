@@ -491,57 +491,61 @@ export function ReceiptDetail() {
 
               return (
                 <div key={product.id} className="bg-beige rounded-lg shadow-md">
-                  <div className="grid grid-cols-[minmax(140px,1fr)_repeat(auto-fit,minmax(70px,1fr))] gap-2 p-2">
-                    <div className="flex flex-col justify-center">
+                  <div className="flex flex-wrap gap-2 p-2">
+                    <div className="flex flex-col justify-center min-w-[120px]">
                       <h3 className="font-medium text-forest mb-1" style={{ fontSize: '11px' }}>{product.name}</h3>
                       <div style={{ fontSize: '11px', color: '#4A4A4A' }}>{product.quantity} × {unitPrice.toFixed(2)}</div>
                       <div className="font-semibold text-forest" style={{ fontSize: '11px' }}>{product.total.toFixed(2)}</div>
                     </div>
-                    {buyers.map(buyer => {
-                      const share = currentDist[buyer.id] || 0;
-                      const inputKey = `${product.id}-${buyer.id}`;
-                      const inputValue = tempInputValues[inputKey] !== undefined
-                        ? tempInputValues[inputKey]
-                        : share;
+                    <div className="flex flex-wrap gap-2 flex-1">
+                      {buyers.map(buyer => {
+                        const share = currentDist[buyer.id] || 0;
+                        const inputKey = `${product.id}-${buyer.id}`;
+                        const inputValue = tempInputValues[inputKey] !== undefined
+                          ? tempInputValues[inputKey]
+                          : share;
 
-                      return (
-                        <div key={buyer.id} className="bg-forest/5 rounded p-2">
-                          <div className="text-xs text-forest/70 mb-1 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            value={inputValue}
-                            onFocus={(e) => e.target.select()}
-                            onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
-                            onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                            className="w-full border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
-                            style={{ fontSize: '11px' }}
-                          />
-                          <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
-                            {(share * unitPrice).toFixed(2)}
+                        return (
+                          <div key={buyer.id} className="bg-forest/5 rounded p-2 min-w-[55px]">
+                            <div className="text-xs text-forest/70 mb-1 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              value={inputValue}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
+                              onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
+                              className="w-auto min-w-[40px] border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
+                              style={{ fontSize: '11px' }}
+                            />
+                            <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
+                              {(share * unitPrice).toFixed(2)}
+                            </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               );
             })}
             <div className="bg-beige rounded-lg p-2 shadow-md">
-              <div className="grid grid-cols-[minmax(140px,1fr)_repeat(auto-fit,minmax(70px,1fr))] gap-2 bg-forest/10 -mx-2 px-2 py-2 rounded-lg">
-                <div className="flex flex-col justify-center font-semibold text-forest" style={{ fontSize: '11px' }}>
+              <div className="flex flex-wrap gap-2 bg-forest/10 -mx-2 px-2 py-2 rounded-lg">
+                <div className="flex flex-col justify-center font-semibold text-forest min-w-[120px]" style={{ fontSize: '11px' }}>
                   Total
                 </div>
-                {buyers.map(buyer => {
-                  const total = calculateBuyerShare(buyer.id, receipt);
-                  return (
-                    <div key={buyer.id} className="flex flex-col justify-center">
-                      <div className="font-semibold text-terracotta text-center" style={{ fontSize: '11px' }}>
-                        {total.toFixed(2)}
+                <div className="flex flex-wrap gap-2 flex-1">
+                  {buyers.map(buyer => {
+                    const total = calculateBuyerShare(buyer.id, receipt);
+                    return (
+                      <div key={buyer.id} className="flex flex-col justify-center min-w-[55px]">
+                        <div className="font-semibold text-terracotta text-center" style={{ fontSize: '11px' }}>
+                          {total.toFixed(2)}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
