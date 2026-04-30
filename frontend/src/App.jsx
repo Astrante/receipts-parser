@@ -19,17 +19,7 @@ function App() {
       <div className="min-h-screen bg-gray-100">
         <nav className="bg-white shadow">
           <div className="max-w-4xl mx-auto px-4 py-4">
-            <div className="flex justify-between items-center">
-              <h1 className="text-xl font-bold text-gray-800">Receipt Parser</h1>
-              <div className="space-x-4">
-                <a href="/" className="text-blue-500 hover:text-blue-700 font-medium">
-                  Receipts
-                </a>
-                <a href="/scan" className="text-blue-500 hover:text-blue-700 font-medium">
-                  Scan
-                </a>
-              </div>
-            </div>
+            <h1 className="text-xl font-bold text-gray-800">Receipt Parser</h1>
           </div>
         </nav>
 
