@@ -490,14 +490,14 @@ export function ReceiptDetail() {
               const currentDist = product.distribution || {};
 
               return (
-                <div key={product.id} className="bg-beige rounded-lg shadow-md">
-                  <div className="flex flex-wrap gap-2 p-2">
-                    <div className="flex flex-col justify-center min-w-[120px]">
+                <div key={product.id} className="bg-beige rounded-lg shadow-md mx-auto" style={{ maxWidth: '500px' }}>
+                  <div className="flex gap-2 p-2">
+                    <div className="flex flex-col justify-center flex-shrink-0">
                       <h3 className="font-medium text-forest mb-1" style={{ fontSize: '11px' }}>{product.name}</h3>
                       <div style={{ fontSize: '11px', color: '#4A4A4A' }}>{product.quantity} × {unitPrice.toFixed(2)}</div>
                       <div className="font-semibold text-forest" style={{ fontSize: '11px' }}>{product.total.toFixed(2)}</div>
                     </div>
-                    <div className="flex flex-wrap gap-2 flex-1">
+                    <div className="flex flex-wrap gap-2 ml-auto">
                       {buyers.map(buyer => {
                         const share = currentDist[buyer.id] || 0;
                         const inputKey = `${product.id}-${buyer.id}`;
@@ -529,12 +529,12 @@ export function ReceiptDetail() {
                 </div>
               );
             })}
-            <div className="bg-beige rounded-lg p-2 shadow-md">
-              <div className="flex flex-wrap gap-2 bg-forest/10 -mx-2 px-2 py-2 rounded-lg">
-                <div className="flex flex-col justify-center font-semibold text-forest min-w-[120px]" style={{ fontSize: '11px' }}>
+            <div className="bg-beige rounded-lg p-2 shadow-md mx-auto" style={{ maxWidth: '500px' }}>
+              <div className="flex gap-2 bg-forest/10 -mx-2 px-2 py-2 rounded-lg">
+                <div className="flex flex-col justify-center font-semibold text-forest flex-shrink-0" style={{ fontSize: '11px' }}>
                   Total
                 </div>
-                <div className="flex flex-wrap gap-2 flex-1">
+                <div className="flex flex-wrap gap-2 ml-auto">
                   {buyers.map(buyer => {
                     const total = calculateBuyerShare(buyer.id, receipt);
                     return (
