@@ -507,7 +507,7 @@ export function ReceiptDetail() {
 
                         return (
                           <div key={buyer.id} className="bg-forest/5 rounded px-1.5 py-0.5">
-                            <div className="text-xs text-forest/70 mb-0.5 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                            <div className="text-xs text-forest/70 mb-0 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
                             <input
                               type="text"
                               inputMode="numeric"
@@ -518,7 +518,7 @@ export function ReceiptDetail() {
                               className="w-[35px] border border-charcoal px-0.5 py-0.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
                               style={{ fontSize: '11px' }}
                             />
-                            <div className="text-right" style={{ fontSize: '10px', color: '#4A4A4A' }}>
+                            <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
                               {(share * unitPrice).toFixed(2)}
                             </div>
                           </div>
