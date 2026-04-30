@@ -506,8 +506,8 @@ export function ReceiptDetail() {
                           : share;
 
                         return (
-                          <div key={buyer.id} className="bg-forest/5 rounded p-2 min-w-[55px]">
-                            <div className="text-xs text-forest/70 mb-1 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
+                          <div key={buyer.id} className="bg-forest/5 rounded px-1.5 py-1">
+                            <div className="text-xs text-forest/70 mb-0.5 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
                             <input
                               type="text"
                               inputMode="numeric"
@@ -515,10 +515,10 @@ export function ReceiptDetail() {
                               onFocus={(e) => e.target.select()}
                               onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
                               onBlur={(e) => handleBlur(product.id, buyer.id, e.target.value)}
-                              className="w-auto min-w-[40px] border border-charcoal p-1 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
+                              className="w-auto border border-charcoal px-1 py-0.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-darkSlate text-beige"
                               style={{ fontSize: '11px' }}
                             />
-                            <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
+                            <div className="text-right mt-0.5" style={{ fontSize: '10px', color: '#4A4A4A' }}>
                               {(share * unitPrice).toFixed(2)}
                             </div>
                           </div>
@@ -538,7 +538,7 @@ export function ReceiptDetail() {
                   {buyers.map(buyer => {
                     const total = calculateBuyerShare(buyer.id, receipt);
                     return (
-                      <div key={buyer.id} className="flex flex-col justify-center min-w-[55px]">
+                      <div key={buyer.id} className="flex flex-col justify-center">
                         <div className="font-semibold text-terracotta text-center" style={{ fontSize: '11px' }}>
                           {total.toFixed(2)}
                         </div>
