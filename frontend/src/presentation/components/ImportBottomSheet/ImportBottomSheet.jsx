@@ -1,16 +1,12 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { BottomSheet } from '../shared/BottomSheet.jsx';
-import { importReceiptFromJSON } from '../../../core/utils/receiptShare.js';
-import { uuid } from '../../../core/utils/uuid.js';
-import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
+import { useAddReceipt } from '../../hooks/useAddReceipt.js';
 
 export function ImportBottomSheet({ isOpen, onClose }) {
   const fileInputRef = useRef(null);
-  const [isParsing, setIsParsing] = useState(false);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const { addReceipt, clearError } = useReceiptStore();
+  const { isProcessing, error, addFromJsonFile } = useAddReceipt();
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
@@ -20,27 +16,13 @@ export function ImportBottomSheet({ isOpen, onClose }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    clearError();
-    setError(null);
-    setIsParsing(true);
-
     try {
-      const importedReceipt = await importReceiptFromJSON(file);
-
-      const newReceipt = {
-        ...importedReceipt,
-        id: uuid(),
-        importedAt: new Date().toISOString()
-      };
-
-      addReceipt(newReceipt);
+      const receipt = await addFromJsonFile(file);
       onClose();
-      navigate(`/receipt/${newReceipt.id}`);
-    } catch (err) {
-      console.error('Import error:', err);
-      setError('Failed to import receipt. Please check the file format.');
+      navigate(`/receipt/${receipt.id}`);
+    } catch {
+      // Ошибка уже выставлена в error из useAddReceipt.
     } finally {
-      setIsParsing(false);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -52,7 +34,7 @@ export function ImportBottomSheet({ isOpen, onClose }) {
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-forest">Import Receipt</h2>
 
-        {isParsing && (
+        {isProcessing && (
           <div className="p-3 bg-forest/10 rounded-lg">
             <div className="flex items-center mb-2">
               <svg className="animate-spin h-4 w-4 text-forest mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -74,7 +56,7 @@ export function ImportBottomSheet({ isOpen, onClose }) {
 
         <button
           onClick={handleImportClick}
-          disabled={isParsing}
+          disabled={isProcessing}
           className="w-full bg-forest hover:bg-forest/90 disabled:bg-forest/30 text-beige font-medium py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
