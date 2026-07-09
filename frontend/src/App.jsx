@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { QRScanner } from './presentation/components/QRScanner/QRScanner.jsx';
 import { ReceiptList } from './presentation/components/ReceiptList/ReceiptList.jsx';
 import { ReceiptDetail } from './presentation/components/ReceiptDetail/ReceiptDetail.jsx';
 import { SplitReceipt } from './presentation/components/SplitReceipt/SplitReceipt.jsx';
@@ -26,7 +25,6 @@ function App() {
         <main className="py-4">
           <Routes>
             <Route path="/" element={<ReceiptList />} />
-            <Route path="/scan" element={<QRScanner />} />
             <Route path="/receipt/:id" element={<ReceiptDetail />} />
             <Route path="/receipt/:id/split" element={<SplitReceipt />} />
             <Route path="/shared/:data" element={<SharedReceipt />} />

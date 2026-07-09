@@ -3,10 +3,12 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { exportReceiptToJSON } from '../../../core/utils/receiptShare.js';
+import { formatDateTime, formatMoney } from '../../../core/utils/format.js';
 import { DropdownMenu } from '../shared/DropdownMenu.jsx';
 import { ScanBottomSheet } from '../ScanBottomSheet/ScanBottomSheet.jsx';
 import { AddByLinkBottomSheet } from '../AddByLinkBottomSheet/AddByLinkBottomSheet.jsx';
 import { ImportBottomSheet } from '../ImportBottomSheet/ImportBottomSheet.jsx';
+import { ConfirmDialog } from '../shared/ConfirmDialog.jsx';
 
 export function ReceiptList() {
   const { receipts, loadReceipts, deleteReceipt } = useReceiptStore();
@@ -14,6 +16,8 @@ export function ReceiptList() {
   const [scanSheetOpen, setScanSheetOpen] = useState(false);
   const [linkSheetOpen, setLinkSheetOpen] = useState(false);
   const [importSheetOpen, setImportSheetOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [exportError, setExportError] = useState(null);
 
   useEffect(() => {
     loadReceipts();
@@ -32,9 +36,7 @@ export function ReceiptList() {
 
   const handleDelete = (id, e) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this receipt?')) {
-      deleteReceipt(id);
-    }
+    setPendingDeleteId(id);
   };
 
   const handleExport = (receipt, e) => {
@@ -43,7 +45,7 @@ export function ReceiptList() {
       exportReceiptToJSON(receipt);
     } catch (error) {
       console.error('Failed to export receipt:', error);
-      alert('Failed to export receipt');
+      setExportError('Failed to export receipt');
     }
   };
 
@@ -58,11 +60,6 @@ export function ReceiptList() {
     const createdB = new Date(b.createdAt || 0).getTime();
     return createdB - createdA;
   });
-
-  const formatDateTime = (date) => {
-    const d = new Date(date);
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
 
   const dropdownTrigger = (
     <button className="bg-terracotta hover:bg-terracotta/90 text-white font-semibold py-2 px-3 rounded-lg transition-colors flex items-center justify-center shadow-lg w-10 h-10">
@@ -135,7 +132,7 @@ export function ReceiptList() {
                       <div className="flex gap-1">
                         <button
                           onClick={(e) => handleExport(receipt, e)}
-                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                           title="Download JSON"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +141,7 @@ export function ReceiptList() {
                         </button>
                         <button
                           onClick={(e) => handleDelete(receipt.id, e)}
-                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                           title="Delete receipt"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,13 +173,13 @@ export function ReceiptList() {
                             {buyersBreakdown.map((buyer, idx) => (
                               <div key={idx} className="text-xs">
                                 <span className="text-forest/70">{buyer.name}:</span>{' '}
-                                <span className="font-semibold text-forest">{buyer.share.toFixed(2)} RSD</span>
+                                <span className="font-semibold text-forest">{formatMoney(buyer.share)}</span>
                               </div>
                             ))}
                           </div>
                         ) : (
                           <div className="font-bold text-lg text-forest">
-                            {receipt.totalAmount.toFixed(2)} RSD
+                            {formatMoney(receipt.totalAmount)}
                           </div>
                         )}
                       </div>
@@ -197,6 +194,28 @@ export function ReceiptList() {
         <ScanBottomSheet isOpen={scanSheetOpen} onClose={() => setScanSheetOpen(false)} />
         <AddByLinkBottomSheet isOpen={linkSheetOpen} onClose={() => setLinkSheetOpen(false)} />
         <ImportBottomSheet isOpen={importSheetOpen} onClose={() => setImportSheetOpen(false)} />
+
+        <ConfirmDialog
+          isOpen={pendingDeleteId !== null}
+          title="Delete receipt"
+          message="Are you sure you want to delete this receipt?"
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          danger
+          onConfirm={() => {
+            if (pendingDeleteId !== null) deleteReceipt(pendingDeleteId);
+            setPendingDeleteId(null);
+          }}
+          onCancel={() => setPendingDeleteId(null)}
+        />
+        <ConfirmDialog
+          isOpen={exportError !== null}
+          title="Export failed"
+          message={exportError ?? ''}
+          confirmLabel="OK"
+          onConfirm={() => setExportError(null)}
+          onCancel={() => setExportError(null)}
+        />
       </div>
     </div>
   );

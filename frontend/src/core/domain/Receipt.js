@@ -1,5 +1,6 @@
 import { createProduct } from './Product.js';
 import { createBuyer } from './Buyer.js';
+import { uuid } from '../utils/uuid.js';
 
 /**
  * Создаёт новую сущность Receipt
@@ -8,7 +9,7 @@ import { createBuyer } from './Buyer.js';
  */
 export function createReceipt(data) {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     storeName: data.storeName || 'Unknown Store',
     date: new Date(data.date),
     invoiceNumber: data.invoiceNumber || '',
