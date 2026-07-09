@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { decodeReceipt } from '../../../core/utils/receiptShare.js';
@@ -6,56 +6,45 @@ import { uuid } from '../../../core/utils/uuid.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { formatDateTime } from '../../../core/utils/format.js';
 
+/**
+ * Декодирует чек из query-параметра ?data= один раз (ленивый инициализатор
+ * useState вместо useEffect — так избегаем setState-в-effect). Возвращает
+ * { receipt, error }.
+ */
+const decodeFromParams = (searchParams) => {
+  const encodedData = searchParams.get('data');
+  if (!encodedData) {
+    return { receipt: null, error: 'No receipt data found in URL' };
+  }
+  try {
+    const decodedReceipt = decodeReceipt(encodedData);
+    return {
+      receipt: {
+        ...decodedReceipt,
+        id: uuid(),
+        originalUrl: decodedReceipt.originalUrl || null,
+        importedAt: new Date().toISOString(),
+      },
+      error: null,
+    };
+  } catch (err) {
+    console.error('Failed to decode receipt:', err);
+    return { receipt: null, error: 'Failed to load receipt. The link may be corrupted.' };
+  }
+};
+
 export function SharedReceipt() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addReceipt } = useReceiptStore();
-  const [receipt, setReceipt] = useState(null);
-  const [error, setError] = useState(null);
-  const [isImporting, setIsImporting] = useState(false);
-
-  useEffect(() => {
-    const encodedData = searchParams.get('data');
-
-    if (!encodedData) {
-      setError('No receipt data found in URL');
-      return;
-    }
-
-    try {
-      const decodedReceipt = decodeReceipt(encodedData);
-
-      // Генерируем новый ID для импортированного чека
-      const importedReceipt = {
-        ...decodedReceipt,
-        id: uuid(),
-        originalUrl: decodedReceipt.originalUrl || null,
-        importedAt: new Date().toISOString()
-      };
-
-      setReceipt(importedReceipt);
-    } catch (err) {
-      console.error('Failed to decode receipt:', err);
-      setError('Failed to load receipt. The link may be corrupted.');
-    }
-  }, [searchParams]);
+  const [{ receipt, error }] = useState(() => decodeFromParams(searchParams));
 
   const handleImportToLocal = () => {
     if (!receipt) return;
-
-    setIsImporting(true);
-    try {
-      addReceipt(receipt);
-
-      // Переходим на страницу чека
-      setTimeout(() => {
-        navigate(`/receipt/${receipt.id}`);
-      }, 500);
-    } catch (err) {
-      console.error('Failed to import receipt:', err);
-      alert('Failed to import receipt');
-      setIsImporting(false);
-    }
+    // addReceipt синхронно кладёт чек в store (единственный источник правды),
+    // поэтому можно переходить сразу — без setTimeout-гонки.
+    addReceipt(receipt);
+    navigate(`/receipt/${receipt.id}`);
   };
 
   if (error) {
@@ -125,22 +114,12 @@ export function SharedReceipt() {
             </button>
             <button
               onClick={handleImportToLocal}
-              disabled={isImporting}
-              className="bg-terracotta hover:bg-terracotta/90 disabled:bg-forest/30 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-2 text-xs"
+              className="bg-terracotta hover:bg-terracotta/90 text-white font-medium py-2 px-3 rounded-lg transition-colors flex items-center gap-2 text-xs"
             >
-              {isImporting ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Importing...
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Import
-                </>
-              )}
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Import
             </button>
           </div>
         </div>
