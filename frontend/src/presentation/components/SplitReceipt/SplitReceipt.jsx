@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { createBuyer, calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
+import { parseAmount } from '../../../core/utils/number.js';
 
 export function SplitReceipt() {
   const { id } = useParams();
@@ -88,7 +89,7 @@ export function SplitReceipt() {
 
     if (buyers.length === 0) return;
 
-    const parsedValue = newValue === '' ? 0 : parseFloat(newValue);
+    const parsedValue = parseAmount(newValue);
     const oldValue = currentDist[buyerId] || 0;
     const difference = parsedValue - oldValue;
 
@@ -167,7 +168,7 @@ export function SplitReceipt() {
     const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
     const isFirstBuyer = buyerId === firstBuyerId;
 
-    const parsedValue = inputValue === '' || inputValue === '0' ? 0 : parseFloat(inputValue);
+    const parsedValue = parseAmount(inputValue);
 
     if (isFirstBuyer) {
       // Правила для первого покупателя
@@ -425,7 +426,7 @@ export function SplitReceipt() {
                             <td key={buyer.id} className="px-3 py-2 text-center">
                               <input
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="decimal"
                                 value={inputValue}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}

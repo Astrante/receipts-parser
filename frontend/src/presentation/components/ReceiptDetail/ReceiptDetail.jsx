@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { calculateBuyerShare, createBuyer } from '../../../core/domain/Buyer.js';
 import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
+import { parseAmount } from '../../../core/utils/number.js';
 
 export function ReceiptDetail() {
   const { id } = useParams();
@@ -117,7 +118,7 @@ export function ReceiptDetail() {
 
     if (buyers.length === 0) return;
 
-    const parsedValue = newValue === '' ? 0 : parseFloat(newValue);
+    const parsedValue = parseAmount(newValue);
     const oldValue = currentDist[buyerId] || 0;
     const difference = parsedValue - oldValue;
 
@@ -196,7 +197,7 @@ export function ReceiptDetail() {
     const firstBuyerId = buyers.length > 0 ? buyers[0].id : null;
     const isFirstBuyer = buyerId === firstBuyerId;
 
-    const parsedValue = inputValue === '' || inputValue === '0' ? 0 : parseFloat(inputValue);
+    const parsedValue = parseAmount(inputValue);
 
     if (isFirstBuyer) {
       // Правила для первого покупателя
@@ -510,7 +511,7 @@ export function ReceiptDetail() {
                             <div className="text-xs text-forest/70 mb-0 text-center" style={{ fontSize: '10px' }}>{buyer.name}</div>
                             <input
                               type="text"
-                              inputMode="numeric"
+                              inputMode="decimal"
                               value={inputValue}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) => handleInputChange(product.id, buyer.id, e.target.value)}
