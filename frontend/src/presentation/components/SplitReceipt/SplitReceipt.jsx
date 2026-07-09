@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { formatNumber } from '../../../core/utils/format.js';
 import { useReceiptSplit } from '../../hooks/useReceiptSplit.js';
 
 export function SplitReceipt() {
@@ -127,7 +128,7 @@ export function SplitReceipt() {
                       </button>
                     </div>
                     <p className="text-base font-bold text-terracotta">
-                      {total.toFixed(2)}
+                      {formatNumber(total)}
                     </p>
                   </div>
                 );
@@ -167,10 +168,10 @@ export function SplitReceipt() {
                           {product.quantity} {product.unit}
                         </td>
                         <td className="px-3 py-2 text-right text-forest/80 text-xs">
-                          {unitPrice.toFixed(2)}
+                          {formatNumber(unitPrice)}
                         </td>
                         <td className="px-3 py-2 text-right font-semibold text-forest text-xs">
-                          {product.total.toFixed(2)}
+                          {formatNumber(product.total)}
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
@@ -195,7 +196,7 @@ export function SplitReceipt() {
                                 className="w-16 border border-forest/30 p-1.5 rounded text-center focus:outline-none focus:ring-2 focus:ring-terracotta bg-white text-forest text-xs"
                               />
                               <div className="text-xs text-forest/60 mt-0.5">
-                                {(share * unitPrice).toFixed(2)}
+                                {formatNumber(share * unitPrice)}
                               </div>
                             </td>
                           );
@@ -210,13 +211,13 @@ export function SplitReceipt() {
                       Total:
                     </td>
                     <td className="px-3 py-2 text-right font-bold text-forest">
-                      {receipt.totalAmount.toFixed(2)}
+                      {formatNumber(receipt.totalAmount)}
                     </td>
                     {buyers.map(buyer => {
                       const total = calculateBuyerShare(buyer.id, receipt);
                       return (
                         <td key={buyer.id} className="px-3 py-2 text-right font-bold text-terracotta">
-                          {total.toFixed(2)}
+                          {formatNumber(total)}
                         </td>
                       );
                     })}

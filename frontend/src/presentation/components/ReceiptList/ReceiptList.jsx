@@ -3,7 +3,7 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { exportReceiptToJSON } from '../../../core/utils/receiptShare.js';
-import { formatDateTime } from '../../../core/utils/format.js';
+import { formatDateTime, formatMoney } from '../../../core/utils/format.js';
 import { DropdownMenu } from '../shared/DropdownMenu.jsx';
 import { ScanBottomSheet } from '../ScanBottomSheet/ScanBottomSheet.jsx';
 import { AddByLinkBottomSheet } from '../AddByLinkBottomSheet/AddByLinkBottomSheet.jsx';
@@ -172,13 +172,13 @@ export function ReceiptList() {
                             {buyersBreakdown.map((buyer, idx) => (
                               <div key={idx} className="text-xs">
                                 <span className="text-forest/70">{buyer.name}:</span>{' '}
-                                <span className="font-semibold text-forest">{buyer.share.toFixed(2)} RSD</span>
+                                <span className="font-semibold text-forest">{formatMoney(buyer.share)}</span>
                               </div>
                             ))}
                           </div>
                         ) : (
                           <div className="font-bold text-lg text-forest">
-                            {receipt.totalAmount.toFixed(2)} RSD
+                            {formatMoney(receipt.totalAmount)}
                           </div>
                         )}
                       </div>

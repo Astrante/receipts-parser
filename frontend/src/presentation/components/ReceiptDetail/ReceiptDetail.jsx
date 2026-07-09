@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
-import { formatDateTime } from '../../../core/utils/format.js';
+import { formatDateTime, formatNumber, formatMoney } from '../../../core/utils/format.js';
 import { useReceiptSplit } from '../../hooks/useReceiptSplit.js';
 
 export function ReceiptDetail() {
@@ -229,7 +229,7 @@ export function ReceiptDetail() {
                             </button>
                             <h3 className="font-semibold pr-4 text-forest" style={{ fontSize: '12px' }}>{buyer.name}</h3>
                             <p className="font-semibold text-terracotta" style={{ fontSize: '13px' }}>
-                              {total.toFixed(2)} RSD
+                              {formatMoney(total)}
                             </p>
                           </div>
                         );
@@ -251,8 +251,8 @@ export function ReceiptDetail() {
                   <div className="flex gap-2 p-2">
                     <div className="flex flex-col justify-center flex-shrink-0">
                       <h3 className="font-medium text-forest mb-1" style={{ fontSize: '11px' }}>{product.name}</h3>
-                      <div style={{ fontSize: '11px', color: '#4A4A4A' }}>{product.quantity} × {unitPrice.toFixed(2)}</div>
-                      <div className="font-semibold text-forest" style={{ fontSize: '11px' }}>{product.total.toFixed(2)}</div>
+                      <div style={{ fontSize: '11px', color: '#4A4A4A' }}>{product.quantity} × {formatNumber(unitPrice)}</div>
+                      <div className="font-semibold text-forest" style={{ fontSize: '11px' }}>{formatNumber(product.total)}</div>
                     </div>
                     <div className="flex flex-wrap gap-2 ml-auto">
                       {buyers.map(buyer => {
@@ -276,7 +276,7 @@ export function ReceiptDetail() {
                               style={{ fontSize: '11px' }}
                             />
                             <div className="text-right mt-1" style={{ fontSize: '10px', color: '#4A4A4A' }}>
-                              {(share * unitPrice).toFixed(2)}
+                              {formatNumber(share * unitPrice)}
                             </div>
                           </div>
                         );
@@ -297,7 +297,7 @@ export function ReceiptDetail() {
                     return (
                       <div key={buyer.id} className="flex flex-col justify-center">
                         <div className="font-semibold text-terracotta text-center" style={{ fontSize: '11px' }}>
-                          {total.toFixed(2)}
+                          {formatNumber(total)}
                         </div>
                       </div>
                     );
@@ -313,11 +313,11 @@ export function ReceiptDetail() {
                 <div className="flex-1">
                   <h3 className="font-medium text-forest" style={{ fontSize: '12px' }}>{product.name}</h3>
                   <p style={{ fontSize: '11px', color: '#4A4A4A' }}>
-                    {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
+                    {product.quantity} {product.unit} × {formatNumber(product.unitPrice)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-forest" style={{ fontSize: '12px' }}>{product.total.toFixed(2)}</p>
+                  <p className="font-semibold text-forest" style={{ fontSize: '12px' }}>{formatNumber(product.total)}</p>
                 </div>
               </div>
             ))}
@@ -327,15 +327,15 @@ export function ReceiptDetail() {
             <div className="bg-beige rounded-lg p-3 shadow-md">
               <div className="flex justify-between items-center mb-1.5" style={{ fontSize: '13px' }}>
                 <span style={{ color: '#4A4A4A' }}>Subtotal:</span>
-                <span className="font-semibold text-forest">{(receipt.totalAmount - receipt.taxAmount).toFixed(2)}</span>
+                <span className="font-semibold text-forest">{formatNumber(receipt.totalAmount - receipt.taxAmount)}</span>
               </div>
               <div className="flex justify-between items-center mb-1.5" style={{ fontSize: '13px' }}>
                 <span style={{ color: '#4A4A4A' }}>VAT:</span>
-                <span className="font-semibold text-forest">{receipt.taxAmount.toFixed(2)}</span>
+                <span className="font-semibold text-forest">{formatNumber(receipt.taxAmount)}</span>
               </div>
               <div className="flex justify-between items-center border-t border-forest/20 pt-1.5 mt-1.5" style={{ fontSize: '13px' }}>
                 <span className="font-bold text-forest">Total:</span>
-                <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
+                <span className="font-bold text-terracotta">{formatNumber(receipt.totalAmount)}</span>
               </div>
             </div>
 
@@ -427,7 +427,7 @@ export function ReceiptDetail() {
                         </button>
                         <h3 className="font-semibold pr-4 text-forest" style={{ fontSize: '12px' }}>{buyer.name}</h3>
                         <p className="font-semibold text-terracotta" style={{ fontSize: '14px' }}>
-                          {total.toFixed(2)}
+                          {formatNumber(total)}
                         </p>
                       </div>
                     );

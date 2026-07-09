@@ -4,7 +4,7 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { decodeReceipt } from '../../../core/utils/receiptShare.js';
 import { uuid } from '../../../core/utils/uuid.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
-import { formatDateTime } from '../../../core/utils/format.js';
+import { formatDateTime, formatNumber } from '../../../core/utils/format.js';
 
 /**
  * Декодирует чек из query-параметра ?data= один раз (ленивый инициализатор
@@ -139,7 +139,7 @@ export function SharedReceipt() {
                   <div key={buyer.id} className="bg-forest/10 p-2 rounded-lg border border-forest/20">
                     <h3 className="font-semibold text-xs text-forest">{buyer.name}</h3>
                     <p className="text-base font-bold text-terracotta">
-                      {total.toFixed(2)}
+                      {formatNumber(total)}
                     </p>
                   </div>
                 );
@@ -177,7 +177,7 @@ export function SharedReceipt() {
                           {product.quantity} {product.unit}
                         </td>
                         <td className="px-3 py-2 text-right font-semibold text-forest text-xs">
-                          {product.total.toFixed(2)}
+                          {formatNumber(product.total)}
                         </td>
                         {buyers.map(buyer => {
                           const share = currentDist[buyer.id] || 0;
@@ -205,11 +205,11 @@ export function SharedReceipt() {
                     <div className="flex-1">
                       <h3 className="font-medium text-forest text-sm">{product.name}</h3>
                       <p className="text-xs text-forest/70">
-                        {product.quantity} {product.unit} × {product.unitPrice.toFixed(2)}
+                        {product.quantity} {product.unit} × {formatNumber(product.unitPrice)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-forest">{product.total.toFixed(2)}</p>
+                      <p className="font-bold text-forest">{formatNumber(product.total)}</p>
                     </div>
                   </div>
                 ))}
@@ -221,7 +221,7 @@ export function SharedReceipt() {
         <div className="bg-beige rounded-lg p-4">
           <div className="flex justify-between items-center text-lg border-t border-forest/20 pt-3 mt-3">
             <span className="font-bold text-forest">Total:</span>
-            <span className="font-bold text-terracotta">{receipt.totalAmount.toFixed(2)}</span>
+            <span className="font-bold text-terracotta">{formatNumber(receipt.totalAmount)}</span>
           </div>
         </div>
       </div>
