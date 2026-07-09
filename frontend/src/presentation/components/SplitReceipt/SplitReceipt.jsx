@@ -8,8 +8,8 @@ import { parseAmount } from '../../../core/utils/number.js';
 export function SplitReceipt() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, updateBuyers, updateProductDistribution, receipts } = useReceiptStore();
-  const [receipt, setReceipt] = useState(null);
+  const { receipts, updateBuyers, updateProductDistribution } = useReceiptStore();
+  const receipt = receipts.find(r => r.id === id) || null;
   const [newBuyerName, setNewBuyerName] = useState('');
   const [savedBuyers, setSavedBuyers] = useState([]);
   const [showBuyerDropdown, setShowBuyerDropdown] = useState(false);
@@ -21,18 +21,6 @@ export function SplitReceipt() {
     const buyers = BuyerRepository.findAll();
     setSavedBuyers(buyers);
   }, []);
-
-  useEffect(() => {
-    if (!activeReceipt || activeReceipt.id !== id) {
-      const found = receipts.find(r => r.id === id);
-      if (found) {
-        setReceipt(found);
-        setActiveReceipt(id);
-      }
-    } else {
-      setReceipt(activeReceipt);
-    }
-  }, [id, activeReceipt, receipts, setActiveReceipt]);
 
   const addBuyer = () => {
     if (!newBuyerName.trim()) return;
@@ -51,26 +39,12 @@ export function SplitReceipt() {
         distribution: { [newBuyer.id]: product.quantity }
       }));
 
-      const updatedReceipt = {
-        ...receipt,
-        buyers: updatedBuyers,
-        products: updatedProducts
-      };
-
       updateBuyers(receipt.id, updatedBuyers);
       updatedProducts.forEach(product => {
         updateProductDistribution(receipt.id, product.id, product.distribution);
       });
-
-      setReceipt(updatedReceipt);
     } else {
-      const updatedReceipt = {
-        ...receipt,
-        buyers: updatedBuyers
-      };
-
       updateBuyers(receipt.id, updatedBuyers);
-      setReceipt(updatedReceipt);
     }
 
     setNewBuyerName('');
@@ -138,13 +112,6 @@ export function SplitReceipt() {
     }
 
     updateProductDistribution(receipt.id, productId, newDistribution);
-
-    setReceipt(prev => ({
-      ...prev,
-      products: prev.products.map(p =>
-        p.id === productId ? { ...p, distribution: newDistribution } : p
-      )
-    }));
   };
 
   const handleInputChange = (productId, buyerId, value) => {
@@ -259,7 +226,6 @@ export function SplitReceipt() {
     }
 
     updateBuyers(receipt.id, updatedBuyers);
-    setReceipt(prev => ({ ...prev, buyers: updatedBuyers }));
   };
 
   if (!receipt) {

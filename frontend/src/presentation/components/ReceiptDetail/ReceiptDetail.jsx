@@ -8,8 +8,8 @@ import { parseAmount } from '../../../core/utils/number.js';
 export function ReceiptDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { activeReceipt, setActiveReceipt, receipts, updateStoreName, updateBuyers, updateProductDistribution } = useReceiptStore();
-  const [receipt, setReceipt] = useState(null);
+  const { receipts, updateStoreName, updateBuyers, updateProductDistribution, deleteReceipt } = useReceiptStore();
+  const receipt = receipts.find(r => r.id === id) || null;
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [editedStoreName, setEditedStoreName] = useState('');
   const [newBuyerName, setNewBuyerName] = useState('');
@@ -25,21 +25,8 @@ export function ReceiptDetail() {
     setSavedBuyers(buyers);
   }, []);
 
-  useEffect(() => {
-    if (!activeReceipt || activeReceipt.id !== id) {
-      const found = receipts.find(r => r.id === id);
-      if (found) {
-        setReceipt(found);
-        setActiveReceipt(id);
-      }
-    } else {
-      setReceipt(activeReceipt);
-    }
-  }, [id, activeReceipt, receipts, setActiveReceipt]);
-
   const handleDelete = () => {
     if (confirm('Are you sure you want to delete this receipt?')) {
-      const { deleteReceipt } = useReceiptStore.getState();
       deleteReceipt(id);
       navigate('/');
     }
@@ -53,7 +40,6 @@ export function ReceiptDetail() {
   const handleSaveStoreName = () => {
     if (editedStoreName.trim()) {
       updateStoreName(receipt.id, editedStoreName.trim());
-      setReceipt(prev => ({ ...prev, storeName: editedStoreName.trim() }));
     }
     setIsEditingStore(false);
   };
@@ -80,26 +66,12 @@ export function ReceiptDetail() {
         distribution: { [newBuyer.id]: product.quantity }
       }));
 
-      const updatedReceipt = {
-        ...receipt,
-        buyers: updatedBuyers,
-        products: updatedProducts
-      };
-
       updateBuyers(receipt.id, updatedBuyers);
       updatedProducts.forEach(product => {
         updateProductDistribution(receipt.id, product.id, product.distribution);
       });
-
-      setReceipt(updatedReceipt);
     } else {
-      const updatedReceipt = {
-        ...receipt,
-        buyers: updatedBuyers
-      };
-
       updateBuyers(receipt.id, updatedBuyers);
-      setReceipt(updatedReceipt);
     }
 
     setNewBuyerName('');
@@ -167,13 +139,6 @@ export function ReceiptDetail() {
     }
 
     updateProductDistribution(receipt.id, productId, newDistribution);
-
-    setReceipt(prev => ({
-      ...prev,
-      products: prev.products.map(p =>
-        p.id === productId ? { ...p, distribution: newDistribution } : p
-      )
-    }));
   };
 
   const handleInputChange = (productId, buyerId, value) => {
@@ -288,7 +253,6 @@ export function ReceiptDetail() {
     }
 
     updateBuyers(receipt.id, updatedBuyers);
-    setReceipt(prev => ({ ...prev, buyers: updatedBuyers }));
   };
 
   if (!receipt) {
