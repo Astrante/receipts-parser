@@ -4,6 +4,7 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { formatDateTime, formatNumber, formatMoney } from '../../../core/utils/format.js';
 import { useReceiptSplit } from '../../hooks/useReceiptSplit.js';
+import { ConfirmDialog } from '../shared/ConfirmDialog.jsx';
 
 export function ReceiptDetail() {
   const { id } = useParams();
@@ -27,12 +28,15 @@ export function ReceiptDetail() {
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [editedStoreName, setEditedStoreName] = useState('');
   const [isBuyersCollapsed, setIsBuyersCollapsed] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const handleDelete = () => {
-    if (confirm('Are you sure you want to delete this receipt?')) {
-      deleteReceipt(id);
-      navigate('/');
-    }
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = () => {
+    deleteReceipt(id);
+    navigate('/');
   };
 
   const handleEditStoreName = () => {
@@ -75,6 +79,16 @@ export function ReceiptDetail() {
 
   return (
     <div className="min-h-screen bg-forest p-3">
+      <ConfirmDialog
+        isOpen={showDeleteConfirm}
+        title="Delete receipt"
+        message="Are you sure you want to delete this receipt?"
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        danger
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteConfirm(false)}
+      />
       <div className="max-w-7xl mx-auto">
         <div className="mb-3 flex justify-between items-start">
           <div className="flex items-center gap-2">

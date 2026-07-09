@@ -8,6 +8,7 @@ import { DropdownMenu } from '../shared/DropdownMenu.jsx';
 import { ScanBottomSheet } from '../ScanBottomSheet/ScanBottomSheet.jsx';
 import { AddByLinkBottomSheet } from '../AddByLinkBottomSheet/AddByLinkBottomSheet.jsx';
 import { ImportBottomSheet } from '../ImportBottomSheet/ImportBottomSheet.jsx';
+import { ConfirmDialog } from '../shared/ConfirmDialog.jsx';
 
 export function ReceiptList() {
   const { receipts, loadReceipts, deleteReceipt } = useReceiptStore();
@@ -15,6 +16,8 @@ export function ReceiptList() {
   const [scanSheetOpen, setScanSheetOpen] = useState(false);
   const [linkSheetOpen, setLinkSheetOpen] = useState(false);
   const [importSheetOpen, setImportSheetOpen] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [exportError, setExportError] = useState(null);
 
   useEffect(() => {
     loadReceipts();
@@ -33,9 +36,7 @@ export function ReceiptList() {
 
   const handleDelete = (id, e) => {
     e.stopPropagation();
-    if (confirm('Are you sure you want to delete this receipt?')) {
-      deleteReceipt(id);
-    }
+    setPendingDeleteId(id);
   };
 
   const handleExport = (receipt, e) => {
@@ -44,7 +45,7 @@ export function ReceiptList() {
       exportReceiptToJSON(receipt);
     } catch (error) {
       console.error('Failed to export receipt:', error);
-      alert('Failed to export receipt');
+      setExportError('Failed to export receipt');
     }
   };
 
@@ -193,6 +194,28 @@ export function ReceiptList() {
         <ScanBottomSheet isOpen={scanSheetOpen} onClose={() => setScanSheetOpen(false)} />
         <AddByLinkBottomSheet isOpen={linkSheetOpen} onClose={() => setLinkSheetOpen(false)} />
         <ImportBottomSheet isOpen={importSheetOpen} onClose={() => setImportSheetOpen(false)} />
+
+        <ConfirmDialog
+          isOpen={pendingDeleteId !== null}
+          title="Delete receipt"
+          message="Are you sure you want to delete this receipt?"
+          confirmLabel="Delete"
+          cancelLabel="Cancel"
+          danger
+          onConfirm={() => {
+            if (pendingDeleteId !== null) deleteReceipt(pendingDeleteId);
+            setPendingDeleteId(null);
+          }}
+          onCancel={() => setPendingDeleteId(null)}
+        />
+        <ConfirmDialog
+          isOpen={exportError !== null}
+          title="Export failed"
+          message={exportError ?? ''}
+          confirmLabel="OK"
+          onConfirm={() => setExportError(null)}
+          onCancel={() => setExportError(null)}
+        />
       </div>
     </div>
   );
