@@ -3,6 +3,7 @@ import { BottomSheet } from '../shared/BottomSheet.jsx';
 import { ReceiptParserService } from '../../../core/services/ReceiptParser.js';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
+import { getUserFriendlyError } from '../../../core/utils/errors.js';
 
 export function AddByLinkBottomSheet({ isOpen, onClose }) {
   const [storeName, setStoreName] = useState('');
@@ -34,19 +35,6 @@ export function AddByLinkBottomSheet({ isOpen, onClose }) {
     } finally {
       setIsParsing(false);
     }
-  };
-
-  const getUserFriendlyError = (errorMessage) => {
-    if (errorMessage.includes('Failed to parse receipt') || errorMessage.includes('Invalid receipt URL')) {
-      return 'Не удалось прочитать чек. Убедитесь, что ссылка правильная.';
-    }
-    if (errorMessage.includes('Invalid receipt data format')) {
-      return 'Чек имеет неправильный формат.';
-    }
-    if (errorMessage.includes('Failed to fetch receipt')) {
-      return 'Не удалось получить данные чека с сервера.';
-    }
-    return errorMessage || 'Произошла ошибка. Попробуйте снова.';
   };
 
   return (
