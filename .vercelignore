@@ -22,8 +22,5 @@ build
 .git
 .gitignore
 
-# Backend (не нужен для Vercel, используем serverless функции)
-backend/src
-
 # Salesforce CLI cache (unrelated to this project)
 .sfdx
