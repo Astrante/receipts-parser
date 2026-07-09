@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { decodeReceipt } from '../../../core/utils/receiptShare.js';
+import { uuid } from '../../../core/utils/uuid.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 
 export function SharedReceipt() {
@@ -26,7 +27,7 @@ export function SharedReceipt() {
       // Генерируем новый ID для импортированного чека
       const importedReceipt = {
         ...decodedReceipt,
-        id: crypto.randomUUID(),
+        id: uuid(),
         originalUrl: decodedReceipt.originalUrl || null,
         importedAt: new Date().toISOString()
       };

@@ -4,6 +4,7 @@ import { ReceiptParserService } from '../../../core/services/ReceiptParser.js';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { importReceiptFromJSON } from '../../../core/utils/receiptShare.js';
+import { uuid } from '../../../core/utils/uuid.js';
 
 export function QRScanner() {
   const [isScanning, setIsScanning] = useState(false);
@@ -110,7 +111,7 @@ export function QRScanner() {
 
       const newReceipt = {
         ...importedReceipt,
-        id: crypto.randomUUID(),
+        id: uuid(),
         importedAt: new Date().toISOString()
       };
 

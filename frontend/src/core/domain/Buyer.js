@@ -1,3 +1,5 @@
+import { uuid } from '../utils/uuid.js';
+
 /**
  * Создаёт новую сущность Buyer
  * @param {Object} data - Данные покупателя
@@ -5,7 +7,7 @@
  */
 export function createBuyer(data) {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     name: data.name || '',
     totalShare: data.totalShare || 0
   };

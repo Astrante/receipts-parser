@@ -1,3 +1,5 @@
+import { uuid } from '../utils/uuid.js';
+
 /**
  * Создаёт новую сущность Product
  * @param {Object} data - Данные продукта
@@ -5,7 +7,7 @@
  */
 export function createProduct(data) {
   return {
-    id: crypto.randomUUID(),
+    id: uuid(),
     name: data.name || '',
     quantity: data.quantity || 0,
     unit: data.unit || 'KOM',

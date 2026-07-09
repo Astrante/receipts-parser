@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { BottomSheet } from '../shared/BottomSheet.jsx';
 import { importReceiptFromJSON } from '../../../core/utils/receiptShare.js';
+import { uuid } from '../../../core/utils/uuid.js';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,7 +29,7 @@ export function ImportBottomSheet({ isOpen, onClose }) {
 
       const newReceipt = {
         ...importedReceipt,
-        id: crypto.randomUUID(),
+        id: uuid(),
         importedAt: new Date().toISOString()
       };
 
