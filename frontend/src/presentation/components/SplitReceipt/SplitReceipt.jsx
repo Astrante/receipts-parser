@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { createBuyer, calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { reconcileDistribution } from '../../../core/domain/Product.js';
 import { BuyerRepository } from '../../../core/repositories/BuyerRepository.js';
 import { parseAmount } from '../../../core/utils/number.js';
 
@@ -111,7 +112,8 @@ export function SplitReceipt() {
       newDistribution[firstBuyerId] = (newDistribution[firstBuyerId] || 0) + excess;
     }
 
-    updateProductDistribution(receipt.id, productId, newDistribution);
+    const finalDistribution = reconcileDistribution(newDistribution, buyers, product.quantity);
+    updateProductDistribution(receipt.id, productId, finalDistribution);
   };
 
   const handleInputChange = (productId, buyerId, value) => {
