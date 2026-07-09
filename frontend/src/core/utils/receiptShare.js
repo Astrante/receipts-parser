@@ -74,7 +74,7 @@ export function importReceiptFromJSON(file) {
       try {
         const receipt = JSON.parse(e.target.result);
         resolve(receipt);
-      } catch (error) {
+      } catch {
         reject(new Error('Invalid JSON file'));
       }
     };

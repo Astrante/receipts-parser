@@ -13,3 +13,6 @@ build
 
 # Salesforce CLI cache (unrelated to this project)
 .sfdx
+
+# Test coverage
+coverage
