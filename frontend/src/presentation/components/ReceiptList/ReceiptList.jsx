@@ -3,6 +3,7 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { useNavigate } from 'react-router-dom';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
 import { exportReceiptToJSON } from '../../../core/utils/receiptShare.js';
+import { formatDateTime } from '../../../core/utils/format.js';
 import { DropdownMenu } from '../shared/DropdownMenu.jsx';
 import { ScanBottomSheet } from '../ScanBottomSheet/ScanBottomSheet.jsx';
 import { AddByLinkBottomSheet } from '../AddByLinkBottomSheet/AddByLinkBottomSheet.jsx';
@@ -58,11 +59,6 @@ export function ReceiptList() {
     const createdB = new Date(b.createdAt || 0).getTime();
     return createdB - createdA;
   });
-
-  const formatDateTime = (date) => {
-    const d = new Date(date);
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
 
   const dropdownTrigger = (
     <button className="bg-terracotta hover:bg-terracotta/90 text-white font-semibold py-2 px-3 rounded-lg transition-colors flex items-center justify-center shadow-lg w-10 h-10">

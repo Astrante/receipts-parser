@@ -4,6 +4,7 @@ import { useReceiptStore } from '../../../store/receiptStore.js';
 import { decodeReceipt } from '../../../core/utils/receiptShare.js';
 import { uuid } from '../../../core/utils/uuid.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { formatDateTime } from '../../../core/utils/format.js';
 
 export function SharedReceipt() {
   const [searchParams] = useSearchParams();
@@ -55,11 +56,6 @@ export function SharedReceipt() {
       alert('Failed to import receipt');
       setIsImporting(false);
     }
-  };
-
-  const formatDateTime = (date) => {
-    const d = new Date(date);
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   };
 
   if (error) {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReceiptStore } from '../../../store/receiptStore.js';
 import { calculateBuyerShare } from '../../../core/domain/Buyer.js';
+import { formatDateTime } from '../../../core/utils/format.js';
 import { useReceiptSplit } from '../../hooks/useReceiptSplit.js';
 
 export function ReceiptDetail() {
@@ -71,11 +72,6 @@ export function ReceiptDetail() {
 
   const buyers = receipt.buyers || [];
   const hasBuyers = buyers.length > 0;
-
-  const formatDateTime = (date) => {
-    const d = new Date(date);
-    return `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
 
   return (
     <div className="min-h-screen bg-forest p-3">
