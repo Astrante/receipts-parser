@@ -135,7 +135,7 @@ export function ReceiptList() {
                       <div className="flex gap-1">
                         <button
                           onClick={(e) => handleExport(receipt, e)}
-                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                           title="Download JSON"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,7 +144,7 @@ export function ReceiptList() {
                         </button>
                         <button
                           onClick={(e) => handleDelete(receipt.id, e)}
-                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-0 group-hover:opacity-100"
+                          className="text-forest/60 hover:text-terracotta hover:bg-forest/10 p-1.5 rounded transition-all opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
                           title="Delete receipt"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
