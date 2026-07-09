@@ -27,11 +27,7 @@ export function DropdownMenu({ trigger, items }) {
       </div>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-xl overflow-hidden shadow-lg z-50 border" style={{
-          backgroundColor: '#F5E6CC',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
-          borderColor: 'rgba(45,79,30,0.15)'
-        }}>
+        <div className="absolute right-0 mt-2 w-48 rounded-xl overflow-hidden z-50 bg-beige border border-forest/15 shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
           {items.map((item, index) => (
             <button
               key={index}
@@ -39,18 +35,11 @@ export function DropdownMenu({ trigger, items }) {
                 item.onClick();
                 setIsOpen(false);
               }}
-              className="w-full text-left flex items-center gap-2 transition-colors"
-              style={{
-                padding: '8px 8px 8px 10px',
-                borderBottom: index < items.length - 1 ? '0.5px solid rgba(45,79,30,0.12)' : 'none',
-                color: '#2D4F1E',
-                fontSize: '14px',
-                fontWeight: '400'
-              }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(45,79,30,0.08)'}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              className={`w-full text-left flex items-center gap-2 transition-colors p-2 pl-2.5 text-forest text-sm font-normal hover:bg-forest/10 ${
+                index < items.length - 1 ? 'border-b border-forest/10' : ''
+              }`}
             >
-              <div style={{ width: '16px', height: '16px', color: '#2D4F1E' }}>
+              <div className="w-4 h-4 text-forest">
                 {item.icon}
               </div>
               <span>{item.label}</span>
