@@ -10,3 +10,6 @@ build
 .idea
 .claude
 .vercel
+
+# Salesforce CLI cache (unrelated to this project)
+.sfdx
