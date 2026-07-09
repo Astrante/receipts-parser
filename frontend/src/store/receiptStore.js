@@ -28,7 +28,7 @@ const migrateLegacyPersistedReceipts = () => {
     }
 
     localStorage.removeItem('receipt-storage');
-  } catch (e) {
+  } catch {
     // Повреждённый legacy-ключ — игнорируем, данные остаются в `receipts`.
   }
 };
