@@ -119,15 +119,7 @@ export default async function handler(req, res) {
     });
 
     if (!specsData.success || !specsData.items) {
-      return res.status(400).json({
-        error: 'Invalid receipt data format',
-        debug: {
-          success: specsData.success,
-          hasItems: !!specsData.items,
-          itemCount: specsData.items?.length,
-          keys: Object.keys(specsData)
-        }
-      });
+      return res.status(400).json({ error: 'Invalid receipt data format' });
     }
 
     // 5. Вернуть структурированные данные
