@@ -3,6 +3,11 @@
   "outputDirectory": "frontend/dist",
   "installCommand": "cd frontend && npm install",
   "framework": null,
+  "functions": {
+    "api/receipts/parse.js": {
+      "includeFiles": "backend/src/services/receiptParser.js"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
