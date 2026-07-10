@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: receipt-parser
+  labels:
+    app.kubernetes.io/name: receipt-parser
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: receipt-parser
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: receipt-parser
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: backend
+          image: receipt-parser-backend:latest
+          imagePullPolicy: IfNotPresent   # образ уже должен быть на ноде (см. README)
+          ports:
+            - name: http
+              containerPort: 3001
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3001"
+            # nginx проксирует /api серверсайд (один origin с фронтом), поэтому
+            # браузер не делает cross-origin запросов и CORS не срабатывает.
+            # Если вынести фронт на отдельный origin — задайте тут FRONTEND_URL.
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+          # У бэкенда нет /health эндпоинта (правок кода не делаем) — проверяем порт.
+          livenessProbe:
+            tcpSocket:
+              port: 3001
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: 3001
+            initialDelaySeconds: 3
+            periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: receipt-parser
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: receipt-parser
+    app.kubernetes.io/component: backend
+  ports:
+    - name: http
+      port: 3001
+      targetPort: http
