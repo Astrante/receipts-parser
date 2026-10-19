@@ -1,0 +1,24 @@
+# Не тащим в build-контекст тяжёлое и лишнее.
+**/node_modules
+**/dist
+**/.cache
+
+.git
+.gitignore
+.github
+.vercel
+.sfdx
+
+.env
+.env.*
+
+*.log
+.DS_Store
+.vscode
+.idea
+
+# Vercel-функция в контейнерах не нужна (в K8s работает Express-бэкенд).
+api
+
+# Документация не нужна в образах.
+*.md

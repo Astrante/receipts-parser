@@ -1,0 +1,26 @@
+# Опционально: требует установленный Ingress-контроллер (например, ingress-nginx).
+# Весь трафик идёт на frontend:80 — nginx ВНУТРИ образа сам проксирует /api на backend,
+# поэтому здесь один backend и никаких перезаписей пути (rewrite-target не нужен).
+#
+# Доступ: приведите host receipt-parser.local в /etc/hosts к IP вашего Ingress-контроллера,
+# либо используйте NodePort / port-forward (см. README).
+# Если у вас другой контроллер — поменяйте ingressClassName (nginx -> traefik и т.п.).
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: receipt-parser
+  namespace: receipt-parser
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: receipt-parser.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
